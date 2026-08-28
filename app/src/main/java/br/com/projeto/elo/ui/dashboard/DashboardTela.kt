@@ -578,7 +578,7 @@ fun ItemLancamento(
             contentAlignment = Alignment.Center
         ) {
             Icon(
-                imageVector = if (isReceita) Icons.Default.ArrowDownward else Icons.Default.ArrowUpward,
+                imageVector = if (isReceita) Icons.Default.ArrowUpward else Icons.Default.ArrowDownward,
                 contentDescription = null,
                 tint = corSeta,
                 modifier = Modifier.size(22.dp)
