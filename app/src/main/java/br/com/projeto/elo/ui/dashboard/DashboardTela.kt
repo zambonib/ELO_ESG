@@ -33,7 +33,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import br.com.projeto.elo.dominio.modelo.TipoTransacao
 import br.com.projeto.elo.dominio.modelo.Transacao
 import br.com.projeto.elo.ui.theme.LaranjaBotao
@@ -49,7 +49,7 @@ import java.util.*
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DashboardTela(
-    viewModel: DashboardViewModel = viewModel(),
+    viewModel: DashboardViewModel = hiltViewModel(),
     aoSair: () -> Unit = {}
 ) {
     // Contexto do Android fica aqui dentro das chaves!

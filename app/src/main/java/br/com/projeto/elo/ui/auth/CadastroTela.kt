@@ -25,16 +25,14 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import br.com.projeto.elo.ui.theme.LaranjaBotao
-import br.com.projeto.elo.ui.theme.VerdeCard
+import androidx.hilt.navigation.compose.hiltViewModel
 import br.com.projeto.elo.ui.theme.VerdeFundo
 import br.com.projeto.elo.ui.theme.VermelhoSeta
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CadastroTela(
-    viewModel: CadastroViewModel = viewModel(),
+    viewModel: CadastroViewModel = hiltViewModel(),
     aoContaCriada: () -> Unit = {},
     aoVoltar: () -> Unit = {}
 ) {

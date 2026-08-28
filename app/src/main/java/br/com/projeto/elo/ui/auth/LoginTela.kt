@@ -16,17 +16,18 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.hilt.navigation.compose.hiltViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginTela(
-    viewModel: LoginViewModel = viewModel(),
-    aoNavegarParaDashboard: () -> Unit
+    viewModel: LoginViewModel = hiltViewModel(),
+    aoNavegarParaDashboard: () -> Unit,
+    aoNavegarParaCadastro: () -> Unit
 ) {
     // Controla se a aba inferior (BottomSheet) está aberta
     var mostrarAbaLogin by remember { mutableStateOf(false) }
@@ -62,7 +63,7 @@ fun LoginTela(
         Spacer(modifier = Modifier.weight(1f))
 
         Button(
-            onClick = { /* Cadastro futuro */ },
+            onClick = { aoNavegarParaCadastro() },
             modifier = Modifier.fillMaxWidth().height(56.dp),
             colors = ButtonDefaults.buttonColors(containerColor = LaranjaBotao),
             shape = RoundedCornerShape(12.dp)
