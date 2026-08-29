@@ -8,6 +8,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import br.com.projeto.elo.ui.auth.CadastroTela
 import br.com.projeto.elo.ui.auth.LoginTela
+import br.com.projeto.elo.ui.cras.CrasSearchScreen
 import br.com.projeto.elo.ui.dashboard.DashboardTela
 import br.com.projeto.elo.ui.theme.ELOTheme
 import com.google.firebase.auth.FirebaseAuth
@@ -55,7 +56,16 @@ class MainActivity : ComponentActivity() {
                                 navController.navigate("login") {
                                     popUpTo("dashboard") { inclusive = true }
                                 }
+                            },
+                            aoNavegarParaCras = {
+                                navController.navigate("cras_search")
                             }
+                        )
+                    }
+
+                    composable("cras_search") {
+                        CrasSearchScreen(
+                            aoVoltar = { navController.popBackStack() }
                         )
                     }
                 }
