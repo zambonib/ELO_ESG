@@ -1,7 +1,10 @@
 package br.com.projeto.elo.data.local
 
 import androidx.room.*
+<<<<<<< HEAD
 import br.com.projeto.elo.dominio.modelo.CategoriaTotal
+=======
+>>>>>>> 3df5725dd0882ba487761f3c383b1179530a7e89
 import br.com.projeto.elo.dominio.modelo.Transacao
 import kotlinx.coroutines.flow.Flow
 
@@ -51,6 +54,7 @@ interface TransacaoDao {
     """)
     fun obterDespesaDoMes(uid: String, inicioDoMes: Long): Flow<Double>
 
+<<<<<<< HEAD
     // READ — soma de receitas dentro de um período arbitrário (usado na tela de Finanças)
     @Query("""
         SELECT COALESCE(SUM(valor), 0) FROM tabela_transacoes
@@ -80,6 +84,8 @@ interface TransacaoDao {
     """)
     fun obterGastosPorCategoria(uid: String, inicio: Long, fim: Long): Flow<List<CategoriaTotal>>
 
+=======
+>>>>>>> 3df5725dd0882ba487761f3c383b1179530a7e89
     // UPDATE
     @Update
     suspend fun atualizarTransacao(transacao: Transacao)

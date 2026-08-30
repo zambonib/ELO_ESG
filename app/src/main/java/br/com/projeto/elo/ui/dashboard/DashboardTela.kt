@@ -36,7 +36,10 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import br.com.projeto.elo.dominio.modelo.TipoTransacao
 import br.com.projeto.elo.dominio.modelo.Transacao
+<<<<<<< HEAD
 import br.com.projeto.elo.ui.components.BarraNavegacaoElo
+=======
+>>>>>>> 3df5725dd0882ba487761f3c383b1179530a7e89
 import br.com.projeto.elo.ui.theme.LaranjaBotao
 import br.com.projeto.elo.ui.theme.VerdeCard
 import br.com.projeto.elo.ui.theme.VerdeFundo
@@ -52,7 +55,11 @@ import java.util.*
 fun DashboardTela(
     viewModel: DashboardViewModel = hiltViewModel(),
     aoSair: () -> Unit = {},
+<<<<<<< HEAD
     aoNavegar: (String) -> Unit = {}
+=======
+    aoNavegarParaCras: () -> Unit = {}
+>>>>>>> 3df5725dd0882ba487761f3c383b1179530a7e89
 ) {
     // Contexto do Android fica aqui dentro das chaves!
     val context = LocalContext.current
@@ -71,6 +78,10 @@ fun DashboardTela(
     var mostrarDialogNome by remember { mutableStateOf(false) }
     var mostrarDialogSenha by remember { mutableStateOf(false) }
     var transacaoParaEditar by remember { mutableStateOf<Transacao?>(null) }
+<<<<<<< HEAD
+=======
+    var abaSelecionada by remember { mutableIntStateOf(0) }
+>>>>>>> 3df5725dd0882ba487761f3c383b1179530a7e89
 
     val saldo = receitaDoMes - despesaDoMes
     val porcentagemGasta = if (receitaDoMes > 0)
@@ -97,6 +108,7 @@ fun DashboardTela(
 
     Scaffold(
         floatingActionButton = {
+<<<<<<< HEAD
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 FloatingActionButton(
                     onClick = { mostrarModalIa = true },
@@ -134,6 +146,57 @@ fun DashboardTela(
             ) {
                 Column {
                     Text("Olá, $nomeUsuario! 👋", color = Color.White, fontSize = 16.sp)
+=======
+            if (abaSelecionada == 0) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    FloatingActionButton(
+                        onClick = { mostrarModalIa = true },
+                        containerColor = LaranjaBotao,
+                        contentColor = Color.White
+                    ) {
+                        Icon(Icons.Default.AutoAwesome, contentDescription = "Registrar Lançamento")
+                    }
+                    Spacer(Modifier.height(4.dp))
+                    Text(
+                        text = "Clique para\nregistrar",
+                        color = Color.White,
+                        fontSize = 10.sp,
+                        textAlign = TextAlign.Center,
+                        lineHeight = 13.sp
+                    )
+                }
+            }
+        },
+        bottomBar = {
+            NavigationBar(containerColor = Color.White, tonalElevation = 8.dp) {
+                val activeColors = NavigationBarItemDefaults.colors(selectedIconColor = VerdeFundo, selectedTextColor = VerdeFundo, indicatorColor = Color.Transparent)
+                NavigationBarItem(selected = abaSelecionada == 0, onClick = { abaSelecionada = 0 }, icon = { Icon(Icons.Default.Home, "") }, label = { Text("Início", maxLines = 1, fontSize = 10.sp) }, colors = activeColors)
+                NavigationBarItem(selected = abaSelecionada == 1, onClick = { abaSelecionada = 1 }, icon = { Icon(Icons.Default.MenuBook, "") }, label = { Text("Trilha", maxLines = 1, fontSize = 10.sp) }, colors = activeColors)
+                NavigationBarItem(selected = abaSelecionada == 2, onClick = { abaSelecionada = 2 }, icon = { Icon(Icons.Default.AccountBalanceWallet, "") }, label = { Text("Finanças", maxLines = 1, fontSize = 10.sp) }, colors = activeColors)
+                NavigationBarItem(selected = abaSelecionada == 3, onClick = { abaSelecionada = 3 }, icon = { Icon(Icons.Default.EmojiEvents, "") }, label = { Text("Conquistas", maxLines = 1, fontSize = 9.sp) }, colors = activeColors)
+                NavigationBarItem(selected = abaSelecionada == 4, onClick = { abaSelecionada = 4 }, icon = { Icon(Icons.Default.Eco, "") }, label = { Text("Economize", maxLines = 1, fontSize = 9.sp) }, colors = activeColors)
+                NavigationBarItem(selected = abaSelecionada == 5, onClick = { abaSelecionada = 5 }, icon = { Icon(Icons.Default.People, "") }, label = { Text("Social", maxLines = 1, fontSize = 10.sp) }, colors = activeColors)
+            }
+        }
+    ) { paddingValues ->
+        Box(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
+            when (abaSelecionada) {
+                0 -> {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(VerdeFundo)
+                            .verticalScroll(rememberScrollState())
+                    ) {
+                        // --- CABEÇALHO ---
+                        Row(
+                            modifier = Modifier.fillMaxWidth().padding(24.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Column {
+                                Text("Olá, $nomeUsuario! 👋", color = Color.White, fontSize = 16.sp)
+>>>>>>> 3df5725dd0882ba487761f3c383b1179530a7e89
                     Text("Dashboard", color = Color.White, fontSize = 28.sp, fontWeight = FontWeight.ExtraBold)
                 }
 
@@ -282,6 +345,21 @@ fun DashboardTela(
                     }
                 }
             }
+<<<<<<< HEAD
+=======
+                    }
+                }
+                1 -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { Text("Trilha: Em breve...") }
+                2 -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { Text("Finanças: Em breve...") }
+                3 -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { Text("Conquistas: Em breve...") }
+                4 -> br.com.projeto.elo.ui.screens.EconomizeScreen()
+                5 -> br.com.projeto.elo.ui.screens.SocialScreen(onNavigate = { screen ->
+                    if (screen == br.com.projeto.elo.navigation.Screen.CRAS_SEARCH) {
+                        aoNavegarParaCras()
+                    }
+                })
+            }
+>>>>>>> 3df5725dd0882ba487761f3c383b1179530a7e89
         }
     }
 
