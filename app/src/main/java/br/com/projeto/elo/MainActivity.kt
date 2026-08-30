@@ -10,6 +10,7 @@ import br.com.projeto.elo.ui.auth.CadastroTela
 import br.com.projeto.elo.ui.auth.LoginTela
 import br.com.projeto.elo.ui.dashboard.DashboardTela
 import br.com.projeto.elo.ui.financas.FinancasTela
+import br.com.projeto.elo.ui.screens.EducationScreen
 import br.com.projeto.elo.ui.theme.ELOTheme
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.AndroidEntryPoint
@@ -57,6 +58,14 @@ class MainActivity : ComponentActivity() {
                                     popUpTo("dashboard") { inclusive = true }
                                 }
                             },
+                            aoNavegar = { rota ->
+                                navController.navigate(rota) { launchSingleTop = true }
+                            }
+                        )
+                    }
+
+                    composable("educacao") {
+                        EducationScreen(
                             aoNavegar = { rota ->
                                 navController.navigate(rota) { launchSingleTop = true }
                             }

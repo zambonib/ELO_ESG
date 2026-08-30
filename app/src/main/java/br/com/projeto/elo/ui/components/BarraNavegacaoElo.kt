@@ -18,8 +18,7 @@ import br.com.projeto.elo.ui.theme.VerdeFundo
 
 /**
  * Barra de navegação inferior compartilhada entre as telas do ELO.
- * As abas de Início e Finanças navegam via [aoNavegar]; Trilha, Simular e Conquistas
- * ainda não foram implementadas e permanecem inertes.
+ * As abas de Início, Educação e Finanças navegam via [aoNavegar].
  */
 @Composable
 fun BarraNavegacaoElo(
@@ -41,10 +40,11 @@ fun BarraNavegacaoElo(
             colors = coresSelecionado
         )
         NavigationBarItem(
-            selected = false,
-            onClick = {},
-            icon = { Icon(Icons.Default.MenuBook, contentDescription = "Trilha") },
-            label = { Text("Trilha") }
+            selected = rotaAtual == "educacao",
+            onClick = { if (rotaAtual != "educacao") aoNavegar("educacao") },
+            icon = { Icon(Icons.Default.MenuBook, contentDescription = "Educação") },
+            label = { Text("Educação") },
+            colors = coresSelecionado
         )
         NavigationBarItem(
             selected = rotaAtual == "financas",

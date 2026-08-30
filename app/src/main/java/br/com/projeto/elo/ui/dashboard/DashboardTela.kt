@@ -46,7 +46,6 @@ import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.*
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DashboardTela(
@@ -54,7 +53,6 @@ fun DashboardTela(
     aoSair: () -> Unit = {},
     aoNavegar: (String) -> Unit = {}
 ) {
-    // Contexto do Android fica aqui dentro das chaves!
     val context = LocalContext.current
 
     val transacoes by viewModel.transacoes.collectAsState()
