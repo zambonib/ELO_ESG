@@ -1,0 +1,29 @@
+{
+    "project_info": {
+        "project_number": "477215602912",
+        "project_id": "elo-esg",
+        "storage_bucket": "elo-esg.firebasestorage.app"
+    },
+    "client": [
+        {
+            "client_info": {
+                "mobilesdk_app_id": "1:477215602912:android:f0c0c1593679c8936f7885",
+                "android_client_info": {
+                    "package_name": "br.com.projeto.elo"
+                }
+            },
+            "oauth_client": [],
+            "api_key": [
+                {
+                    "current_key": "AIzaSyCREFtjk6_7jESijomPCHD5CF_jW98uomI"
+                }
+            ],
+            "services": {
+                "appinvite_service": {
+                    "other_platform_oauth_client": []
+                }
+            }
+        }
+    ],
+    "configuration_version": "1"
+}
