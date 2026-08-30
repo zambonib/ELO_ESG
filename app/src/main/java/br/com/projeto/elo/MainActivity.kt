@@ -8,13 +8,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import br.com.projeto.elo.ui.auth.CadastroTela
 import br.com.projeto.elo.ui.auth.LoginTela
-<<<<<<< HEAD
 import br.com.projeto.elo.ui.dashboard.DashboardTela
 import br.com.projeto.elo.ui.financas.FinancasTela
-=======
-import br.com.projeto.elo.ui.cras.CrasSearchScreen
-import br.com.projeto.elo.ui.dashboard.DashboardTela
->>>>>>> 3df5725dd0882ba487761f3c383b1179530a7e89
 import br.com.projeto.elo.ui.theme.ELOTheme
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.AndroidEntryPoint
@@ -62,28 +57,17 @@ class MainActivity : ComponentActivity() {
                                     popUpTo("dashboard") { inclusive = true }
                                 }
                             },
-<<<<<<< HEAD
                             aoNavegar = { rota ->
                                 navController.navigate(rota) { launchSingleTop = true }
-=======
-                            aoNavegarParaCras = {
-                                navController.navigate("cras_search")
->>>>>>> 3df5725dd0882ba487761f3c383b1179530a7e89
                             }
                         )
                     }
 
-<<<<<<< HEAD
                     composable("financas") {
                         FinancasTela(
                             aoNavegar = { rota ->
                                 navController.navigate(rota) { launchSingleTop = true }
                             }
-=======
-                    composable("cras_search") {
-                        CrasSearchScreen(
-                            aoVoltar = { navController.popBackStack() }
->>>>>>> 3df5725dd0882ba487761f3c383b1179530a7e89
                         )
                     }
                 }

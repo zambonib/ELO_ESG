@@ -2,11 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-<<<<<<< HEAD
-=======
     <uses-permission android:name="android.permission.INTERNET" />
 
->>>>>>> 3df5725dd0882ba487761f3c383b1179530a7e89
     <application
         android:name=".EloApplication"
         android:allowBackup="true"

@@ -3,6 +3,7 @@ package br.com.projeto.elo.ui.auth
 import br.com.projeto.elo.ui.theme.LaranjaBotao
 import br.com.projeto.elo.ui.theme.VerdeCard
 import br.com.projeto.elo.ui.theme.VerdeFundo
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -12,10 +13,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import br.com.projeto.elo.R
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.text.input.ImeAction
@@ -41,18 +45,21 @@ fun LoginTela(
     ) {
         Spacer(modifier = Modifier.height(48.dp))
 
-        Box(
-            modifier = Modifier
-                .size(80.dp)
-                .background(VerdeCard, shape = RoundedCornerShape(20.dp)),
-            contentAlignment = Alignment.Center
-        ) {
-            Text("⚪🟡", fontSize = 24.sp)
-        }
+        Image(
+            painter = painterResource(id = R.drawable.elo_logo),
+            contentDescription = "Logo do ELO",
+            contentScale = ContentScale.Fit,
+            modifier = Modifier.size(120.dp)
+        )
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        Text("ELO", fontSize = 40.sp, fontWeight = FontWeight.ExtraBold, color = Color.White)
+        Image(
+            painter = painterResource(id = R.drawable.elo_letras),
+            contentDescription = "ELO",
+            contentScale = ContentScale.Fit,
+            modifier = Modifier.height(48.dp)
+        )
         Text("Conectando você ao seu futuro", fontSize = 16.sp, color = Color.White, modifier = Modifier.padding(bottom = 32.dp))
 
         BeneficioCard(emoji = "📚", texto = "Aprenda finanças em minutos por dia")
