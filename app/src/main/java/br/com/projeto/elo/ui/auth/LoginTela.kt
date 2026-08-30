@@ -77,6 +77,7 @@ fun LoginTela(
         BeneficioCard(emoji = "📚", texto = "Aprenda finanças em minutos por dia")
         BeneficioCard(emoji = "💰", texto = "Controle seus gastos com facilidade")
         BeneficioCard(emoji = "🏆", texto = "Ganhe conquistas e evolua")
+        BeneficioCard(emoji = "🌱", texto = "Economize: cuide do meio ambiente e poupe dinheiro")
         BeneficioCard(emoji = "🤝", texto = "Conheça seus direitos e benefícios")
 
         Spacer(modifier = Modifier.height(28.dp))

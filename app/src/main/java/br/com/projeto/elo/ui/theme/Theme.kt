@@ -30,7 +30,7 @@ private val LightColorScheme = lightColorScheme(
 @Composable
 fun ELOTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    dynamicColor: Boolean = false, // Mantém a identidade visual consistente do ELO
+    dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {
