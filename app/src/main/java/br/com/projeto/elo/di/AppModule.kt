@@ -59,6 +59,16 @@ object AppModule {
 
     @Provides
     @Singleton
+    fun provideViaCepApi(okHttpClient: OkHttpClient): br.com.projeto.elo.data.remote.ViaCepApi =
+        Retrofit.Builder()
+            .baseUrl("https://viacep.com.br/ws/")
+            .client(okHttpClient)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+            .create(br.com.projeto.elo.data.remote.ViaCepApi::class.java)
+
+    @Provides
+    @Singleton
     fun provideSharedPreferences(@ApplicationContext context: Context): SharedPreferences =
         context.getSharedPreferences("elo_prefs", Context.MODE_PRIVATE)
 }

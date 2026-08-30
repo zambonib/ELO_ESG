@@ -8,6 +8,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import br.com.projeto.elo.ui.auth.CadastroTela
 import br.com.projeto.elo.ui.auth.LoginTela
+import br.com.projeto.elo.ui.cras.CrasSearchScreen
 import br.com.projeto.elo.ui.dashboard.DashboardTela
 import br.com.projeto.elo.ui.financas.FinancasTela
 import br.com.projeto.elo.ui.screens.ConquistasScreen
@@ -112,6 +113,13 @@ class MainActivity : ComponentActivity() {
                             aoNavegar = { rota ->
                                 navController.navigate(rota) { launchSingleTop = true }
                             }
+                        )
+                    }
+
+                    // 9. Busca do CRAS por CEP
+                    composable("cras_search") {
+                        CrasSearchScreen(
+                            aoVoltar = { navController.popBackStack() }
                         )
                     }
                 }
