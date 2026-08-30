@@ -11,11 +11,11 @@
 
 ---
 
-## 🎯 1. Sobre o Projeto e Requisitos FIAP
+## 🎯 1. Sobre o Projeto e Requisitos.
 
 O **ELO** é um aplicativo mobile nativo desenvolvido para transformar a teoria dos princípios **ESG (*Environmental, Social and Governance*)** em uma solução prática, inclusiva e escalável.
 
-O projeto foi construído para atender com excelência aos critérios da **FIAP**:
+O projeto foi construído para atender com excelência aos critérios universitários:
 - ✅ **Plataforma Nativa:** Construído 100% nativo em **Android (Kotlin)** com arquitetura moderna e declarativa em **Jetpack Compose (Material 3)**.
 - ✅ **Escopo de Telas:** Excede o requisito mínimo de 5 telas, entregando **6 telas principais completas** além dos fluxos de autenticação e busca geolocalizada.
 - ✅ **Integração com Serviços Externos (Serverless):** Sem necessidade de desenvolvimento de back-end dedicado, integrando-se via APIs e BaaS:
@@ -168,7 +168,12 @@ app/src/main/java/br/com/projeto/elo/
 ## 👥 8. Equipe do Projeto
 
 Projeto desenvolvido como parte dos requisitos acadêmicos da **FIAP (Fase de Desenvolvimento Mobile Nativo)**.
-
+- RM: 567973
+- RM:
+- RM:
+- RM:
+- RM:
+- 
 - **Repositório Oficial:** [github.com/zambonib/ELO_ESG](https://github.com/zambonib/ELO_ESG.git)
 - **Versão:** MVP v1.1 / v1.2 Release
 
