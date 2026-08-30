@@ -1,13 +1,14 @@
 package br.com.projeto.elo.ui.auth
 
-import br.com.projeto.elo.ui.theme.LaranjaBotao
-import br.com.projeto.elo.ui.theme.VerdeCard
-import br.com.projeto.elo.ui.theme.VerdeFundo
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -16,15 +17,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import br.com.projeto.elo.R
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.hilt.navigation.compose.hiltViewModel
+import br.com.projeto.elo.R
+import br.com.projeto.elo.ui.theme.LaranjaBotao
+import br.com.projeto.elo.ui.theme.VerdeCard
+import br.com.projeto.elo.ui.theme.VerdeFundo
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -40,34 +42,44 @@ fun LoginTela(
         modifier = Modifier
             .fillMaxSize()
             .background(VerdeFundo)
-            .padding(24.dp),
+            .padding(24.dp)
+            .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Spacer(modifier = Modifier.height(48.dp))
+        Spacer(modifier = Modifier.height(36.dp))
 
+        // Logo oficial ELO
         Image(
             painter = painterResource(id = R.drawable.elo_logo),
             contentDescription = "Logo do ELO",
             contentScale = ContentScale.Fit,
-            modifier = Modifier.size(120.dp)
+            modifier = Modifier.size(100.dp)
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(12.dp))
 
-        Image(
-            painter = painterResource(id = R.drawable.elo_letras),
-            contentDescription = "ELO",
-            contentScale = ContentScale.Fit,
-            modifier = Modifier.height(48.dp)
+        // Nome da Aplicação em texto nítido e destacado
+        Text(
+            text = "ELO",
+            fontSize = 38.sp,
+            fontWeight = FontWeight.ExtraBold,
+            color = Color.White
         )
-        Text("Conectando você ao seu futuro", fontSize = 16.sp, color = Color.White, modifier = Modifier.padding(bottom = 32.dp))
+
+        // Slogan
+        Text(
+            text = "Conectando você ao seu futuro",
+            fontSize = 15.sp,
+            color = Color.White.copy(alpha = 0.9f),
+            modifier = Modifier.padding(top = 2.dp, bottom = 28.dp)
+        )
 
         BeneficioCard(emoji = "📚", texto = "Aprenda finanças em minutos por dia")
         BeneficioCard(emoji = "💰", texto = "Controle seus gastos com facilidade")
         BeneficioCard(emoji = "🏆", texto = "Ganhe conquistas e evolua")
         BeneficioCard(emoji = "🤝", texto = "Conheça seus direitos e benefícios")
 
-        Spacer(modifier = Modifier.weight(1f))
+        Spacer(modifier = Modifier.height(28.dp))
 
         Button(
             onClick = { aoNavegarParaCadastro() },
@@ -81,7 +93,7 @@ fun LoginTela(
         Spacer(modifier = Modifier.height(16.dp))
 
         OutlinedButton(
-            onClick = { mostrarAbaLogin = true }, // Abre a aba de login!
+            onClick = { mostrarAbaLogin = true },
             modifier = Modifier.fillMaxWidth().height(56.dp).border(1.dp, Color.White, RoundedCornerShape(12.dp)),
             colors = ButtonDefaults.outlinedButtonColors(containerColor = Color.Transparent),
             shape = RoundedCornerShape(12.dp)
@@ -119,7 +131,7 @@ fun AbaDeLogin(viewModel: LoginViewModel, aoNavegarParaDashboard: () -> Unit) {
             label = { Text("E-mail") },
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Email,
-                imeAction = ImeAction.Next  // ← avança para o próximo campo
+                imeAction = ImeAction.Next
             ),
             modifier = Modifier.fillMaxWidth()
         )
@@ -130,7 +142,7 @@ fun AbaDeLogin(viewModel: LoginViewModel, aoNavegarParaDashboard: () -> Unit) {
             label = { Text("Senha") },
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Password,
-                imeAction = ImeAction.Done  // ← botão "Concluir"
+                imeAction = ImeAction.Done
             ),
             keyboardActions = KeyboardActions(
                 onDone = { viewModel.realizarLogin(aoSucesso = aoNavegarParaDashboard) }
@@ -139,7 +151,7 @@ fun AbaDeLogin(viewModel: LoginViewModel, aoNavegarParaDashboard: () -> Unit) {
             modifier = Modifier.fillMaxWidth()
         )
 
-        // Caso o Firebase Gere  erro.
+        // Caso o Firebase gere erro
         if (mensagemErro.isNotEmpty()) {
             Text(mensagemErro, color = MaterialTheme.colorScheme.error, modifier = Modifier.padding(top = 8.dp))
         }
@@ -159,7 +171,11 @@ fun AbaDeLogin(viewModel: LoginViewModel, aoNavegarParaDashboard: () -> Unit) {
 @Composable
 fun BeneficioCard(emoji: String, texto: String) {
     Row(
-        modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp).background(VerdeCard, shape = RoundedCornerShape(12.dp)).padding(16.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 6.dp)
+            .background(VerdeCard, shape = RoundedCornerShape(12.dp))
+            .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(text = emoji, fontSize = 20.sp)
