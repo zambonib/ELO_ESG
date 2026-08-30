@@ -21,7 +21,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import br.com.projeto.elo.navigation.Screen
+import br.com.projeto.elo.ui.components.BarraNavegacaoElo
 import br.com.projeto.elo.ui.theme.*
 
 /**
@@ -43,7 +43,9 @@ data class BenefitItem(
  * Tela de Apoio e Assistência Social (SocialScreen).
  */
 @Composable
-fun SocialScreen(onNavigate: (Screen) -> Unit) {
+fun SocialScreen(
+    aoNavegar: (String) -> Unit = {}
+) {
     var expandedId by remember { mutableStateOf<Int?>(null) }
 
     val benefits = listOf(
@@ -112,25 +114,31 @@ fun SocialScreen(onNavigate: (Screen) -> Unit) {
         )
     )
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color(0xFFF9FAFB)) // BackgroundLight
-            .verticalScroll(rememberScrollState())
-            .padding(bottom = 90.dp)
-    ) {
-        // Header Azul Escuro
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(Brush.linearGradient(listOf(Color(0xFF0F4C81), Color(0xFF1D6FA4))))
-                .padding(20.dp)
-        ) {
-            Column {
-                Text("Assistência Social 🤝", color = Color.White, fontSize = 24.sp, fontWeight = FontWeight.Black)
-                Text("Conheça os benefícios que são seus por direito", color = Color.White.copy(alpha = 0.7f), fontSize = 14.sp)
-            }
+    Scaffold(
+        bottomBar = {
+            BarraNavegacaoElo(rotaAtual = "social", aoNavegar = aoNavegar)
         }
+    ) { paddingValues ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(BackgroundLight)
+                .padding(paddingValues)
+                .verticalScroll(rememberScrollState())
+        ) {
+            // Header Azul Escuro
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Brush.linearGradient(listOf(Color(0xFF0F4C81), Color(0xFF1D6FA4))))
+                    .statusBarsPadding()
+                    .padding(24.dp)
+            ) {
+                Column {
+                    Text("Assistência Social 🤝", color = Color.White, fontSize = 24.sp, fontWeight = FontWeight.Black)
+                    Text("Conheça os benefícios que são seus por direito", color = Color.White.copy(alpha = 0.85f), fontSize = 14.sp)
+                }
+            }
 
         Column(
             modifier = Modifier.padding(20.dp),
@@ -157,7 +165,7 @@ fun SocialScreen(onNavigate: (Screen) -> Unit) {
                 }
                 Spacer(modifier = Modifier.height(12.dp))
                 Button(
-                    onClick = { onNavigate(Screen.CRAS_SEARCH) },
+                    onClick = { aoNavegar("cras_search") },
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2563EB)),
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(8.dp)
@@ -257,4 +265,5 @@ fun SocialScreen(onNavigate: (Screen) -> Unit) {
             }
         }
     }
+}
 }

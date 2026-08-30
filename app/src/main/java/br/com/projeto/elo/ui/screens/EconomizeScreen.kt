@@ -25,6 +25,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import br.com.projeto.elo.ui.components.BarraNavegacaoElo
 import br.com.projeto.elo.ui.theme.*
 
 /**
@@ -32,21 +33,29 @@ import br.com.projeto.elo.ui.theme.*
  * Focada em guias de economia: Água, Eletricidade e Tecnologia.
  */
 @Composable
-fun EconomizeScreen() {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color(0xFFF9FAFB)) // BackgroundLight
-            .verticalScroll(rememberScrollState())
-            .padding(bottom = 90.dp)
-    ) {
-        // Header Verde (Economize)
-        Box(
+fun EconomizeScreen(
+    aoNavegar: (String) -> Unit = {}
+) {
+    Scaffold(
+        bottomBar = {
+            BarraNavegacaoElo(rotaAtual = "economize", aoNavegar = aoNavegar)
+        }
+    ) { paddingValues ->
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .background(Brush.linearGradient(listOf(Color(0xFF059669), Color(0xFF10B981))))
-                .padding(20.dp)
+                .fillMaxSize()
+                .background(BackgroundLight)
+                .padding(paddingValues)
+                .verticalScroll(rememberScrollState())
         ) {
+            // Header Verde (Economize)
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Brush.linearGradient(listOf(Color(0xFF059669), Color(0xFF10B981))))
+                    .statusBarsPadding()
+                    .padding(24.dp)
+            ) {
             Column(modifier = Modifier.padding(top = 16.dp)) {
                 Text(
                     "Economize 🌱",
@@ -112,6 +121,7 @@ fun EconomizeScreen() {
             )
         }
     }
+}
 }
 
 @Composable
