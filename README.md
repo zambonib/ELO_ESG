@@ -169,10 +169,10 @@ app/src/main/java/br/com/projeto/elo/
 
 Projeto desenvolvido como parte dos requisitos acadêmicos da **FIAP (Fase de Desenvolvimento Mobile Nativo)**.
 - RM: 567973
-- RM:
-- RM:
-- RM:
-- RM:
+- RM: 567059
+- RM: 567306
+- RM: 568005
+- RM: 568511
 - 
 - **Repositório Oficial:** [github.com/zambonib/ELO_ESG](https://github.com/zambonib/ELO_ESG.git)
 - **Versão:** MVP v1.1 / v1.2 Release
