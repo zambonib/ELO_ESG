@@ -64,7 +64,6 @@ class CrasSearchViewModel @Inject constructor(
                     _erro.value = "CEP não encontrado ou inválido."
                 } else {
                     _enderecoEncontrado.value = "${response.logradouro} - ${response.bairro}, ${response.localidade}/${response.uf}"
-                    // Mockar 2 unidades do CRAS
                     _resultados.value = listOf(
                         MockCras(
                             id = 1,

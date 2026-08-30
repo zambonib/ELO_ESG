@@ -14,7 +14,7 @@ data class Candidate(val content: Content?)
 interface GeminiApi {
     @POST("v1beta/models/gemini-flash-lite-latest:generateContent")
     suspend fun classificarTransacao(
-        @Header("X-goog-api-key") apiKey: String, // ← Chave via Header, não URL!
+        @Header("X-goog-api-key") apiKey: String,
         @Body request: GeminiRequest
     ): GeminiResponse
 }

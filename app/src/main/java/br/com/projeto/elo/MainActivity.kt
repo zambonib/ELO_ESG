@@ -10,6 +10,11 @@ import br.com.projeto.elo.ui.auth.CadastroTela
 import br.com.projeto.elo.ui.auth.LoginTela
 import br.com.projeto.elo.ui.cras.CrasSearchScreen
 import br.com.projeto.elo.ui.dashboard.DashboardTela
+import br.com.projeto.elo.ui.financas.FinancasTela
+import br.com.projeto.elo.ui.screens.ConquistasScreen
+import br.com.projeto.elo.ui.screens.EconomizeScreen
+import br.com.projeto.elo.ui.screens.EducationScreen
+import br.com.projeto.elo.ui.screens.SocialScreen
 import br.com.projeto.elo.ui.theme.ELOTheme
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.AndroidEntryPoint
@@ -26,6 +31,7 @@ class MainActivity : ComponentActivity() {
 
                 NavHost(navController = navController, startDestination = telaInicial) {
 
+                    // 1. Login
                     composable("login") {
                         LoginTela(
                             aoNavegarParaDashboard = {
@@ -39,6 +45,7 @@ class MainActivity : ComponentActivity() {
                         )
                     }
 
+                    // 2. Cadastro
                     composable("cadastro") {
                         CadastroTela(
                             aoContaCriada = {
@@ -50,6 +57,7 @@ class MainActivity : ComponentActivity() {
                         )
                     }
 
+                    // 3. Início (Dashboard)
                     composable("dashboard") {
                         DashboardTela(
                             aoSair = {
@@ -57,12 +65,58 @@ class MainActivity : ComponentActivity() {
                                     popUpTo("dashboard") { inclusive = true }
                                 }
                             },
-                            aoNavegarParaCras = {
-                                navController.navigate("cras_search")
+                            aoNavegar = { rota ->
+                                navController.navigate(rota) { launchSingleTop = true }
                             }
                         )
                     }
 
+                    // 4. Educação
+                    composable("educacao") {
+                        EducationScreen(
+                            aoNavegar = { rota ->
+                                navController.navigate(rota) { launchSingleTop = true }
+                            }
+                        )
+                    }
+
+                    // 5. Finanças
+                    composable("financas") {
+                        FinancasTela(
+                            aoNavegar = { rota ->
+                                navController.navigate(rota) { launchSingleTop = true }
+                            }
+                        )
+                    }
+
+                    // 6. Conquistas
+                    composable("conquistas") {
+                        ConquistasScreen(
+                            aoNavegar = { rota ->
+                                navController.navigate(rota) { launchSingleTop = true }
+                            }
+                        )
+                    }
+
+                    // 7. Economize
+                    composable("economize") {
+                        EconomizeScreen(
+                            aoNavegar = { rota ->
+                                navController.navigate(rota) { launchSingleTop = true }
+                            }
+                        )
+                    }
+
+                    // 8. Social
+                    composable("social") {
+                        SocialScreen(
+                            aoNavegar = { rota ->
+                                navController.navigate(rota) { launchSingleTop = true }
+                            }
+                        )
+                    }
+
+                    // 9. Busca do CRAS por CEP
                     composable("cras_search") {
                         CrasSearchScreen(
                             aoVoltar = { navController.popBackStack() }

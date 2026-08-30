@@ -1,5 +1,6 @@
 package br.com.projeto.elo.ui.auth
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -8,7 +9,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
@@ -17,7 +18,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -26,6 +29,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import br.com.projeto.elo.R
 import br.com.projeto.elo.ui.theme.VerdeFundo
 import br.com.projeto.elo.ui.theme.VermelhoSeta
 
@@ -56,7 +60,7 @@ fun CadastroTela(
                 title = { Text("Criar Conta", fontWeight = FontWeight.Bold) },
                 navigationIcon = {
                     IconButton(onClick = aoVoltar) {
-                        Icon(Icons.Default.ArrowBack, "Voltar")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, "Voltar")
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -74,16 +78,37 @@ fun CadastroTela(
                 .padding(paddingValues)
                 .verticalScroll(rememberScrollState())
         ) {
-            // Cabeçalho
+            // Cabeçalho com Logo, Nome e Slogan do ELO
             Column(
-                modifier = Modifier.fillMaxWidth().padding(24.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 24.dp, vertical = 16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text("🌱", fontSize = 48.sp)
+                Image(
+                    painter = painterResource(id = R.drawable.elo_logo),
+                    contentDescription = "Logo do ELO",
+                    contentScale = ContentScale.Fit,
+                    modifier = Modifier.size(72.dp)
+                )
                 Spacer(Modifier.height(8.dp))
-                Text("Bem-vindo ao ELO!", color = Color.White,
-                    fontSize = 22.sp, fontWeight = FontWeight.Bold)
-                Text("Crie sua conta gratuita", color = Color.White.copy(alpha = 0.8f), fontSize = 15.sp)
+                Text(
+                    text = "ELO",
+                    color = Color.White,
+                    fontSize = 28.sp,
+                    fontWeight = FontWeight.ExtraBold
+                )
+                Text(
+                    text = "Conectando você ao seu futuro",
+                    color = Color.White.copy(alpha = 0.9f),
+                    fontSize = 14.sp
+                )
+                Spacer(Modifier.height(4.dp))
+                Text(
+                    text = "Crie sua conta gratuita",
+                    color = Color.White.copy(alpha = 0.75f),
+                    fontSize = 13.sp
+                )
             }
 
             // Card do formulário
@@ -93,7 +118,9 @@ fun CadastroTela(
                 colors = CardDefaults.cardColors(containerColor = Color.White)
             ) {
                 Column(
-                    modifier = Modifier.fillMaxWidth().padding(28.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(28.dp),
                     verticalArrangement = Arrangement.spacedBy(14.dp)
                 ) {
                     Text("Seus dados", fontSize = 20.sp, fontWeight = FontWeight.Bold)
@@ -144,8 +171,11 @@ fun CadastroTela(
                         else PasswordVisualTransformation(),
                         trailingIcon = {
                             IconButton(onClick = { senhaVisivel = !senhaVisivel }) {
-                                Icon(if (senhaVisivel) Icons.Default.VisibilityOff
-                                else Icons.Default.Visibility, null)
+                                Icon(
+                                    if (senhaVisivel) Icons.Default.VisibilityOff
+                                    else Icons.Default.Visibility,
+                                    null
+                                )
                             }
                         },
                         isError = !senhaForte,
@@ -173,8 +203,11 @@ fun CadastroTela(
                         else PasswordVisualTransformation(),
                         trailingIcon = {
                             IconButton(onClick = { confirmarSenhaVisivel = !confirmarSenhaVisivel }) {
-                                Icon(if (confirmarSenhaVisivel) Icons.Default.VisibilityOff
-                                else Icons.Default.Visibility, null)
+                                Icon(
+                                    if (confirmarSenhaVisivel) Icons.Default.VisibilityOff
+                                    else Icons.Default.Visibility,
+                                    null
+                                )
                             }
                         },
                         isError = !senhasCoincidindo,
@@ -228,8 +261,12 @@ fun CadastroTela(
                                 strokeWidth = 2.dp
                             )
                         } else {
-                            Text("Criar minha conta", fontWeight = FontWeight.Bold,
-                                fontSize = 16.sp, color = Color.White)
+                            Text(
+                                "Criar minha conta",
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 16.sp,
+                                color = Color.White
+                            )
                         }
                     }
 

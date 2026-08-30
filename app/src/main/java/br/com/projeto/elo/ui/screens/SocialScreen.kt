@@ -1,5 +1,7 @@
 package br.com.projeto.elo.ui.screens
 
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -11,6 +13,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.OpenInBrowser
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -18,10 +22,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import br.com.projeto.elo.navigation.Screen
+import br.com.projeto.elo.ui.components.BarraNavegacaoElo
 import br.com.projeto.elo.ui.theme.*
 
 /**
@@ -43,8 +48,12 @@ data class BenefitItem(
  * Tela de Apoio e Assistência Social (SocialScreen).
  */
 @Composable
-fun SocialScreen(onNavigate: (Screen) -> Unit) {
+fun SocialScreen(
+    aoNavegar: (String) -> Unit = {}
+) {
+    val context = LocalContext.current
     var expandedId by remember { mutableStateOf<Int?>(null) }
+    var mostrarModalCras by remember { mutableStateOf(false) }
 
     val benefits = listOf(
         BenefitItem(
@@ -112,149 +121,238 @@ fun SocialScreen(onNavigate: (Screen) -> Unit) {
         )
     )
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color(0xFFF9FAFB)) // BackgroundLight
-            .verticalScroll(rememberScrollState())
-            .padding(bottom = 90.dp)
-    ) {
-        // Header Azul Escuro
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(Brush.linearGradient(listOf(Color(0xFF0F4C81), Color(0xFF1D6FA4))))
-                .padding(20.dp)
-        ) {
-            Column {
-                Text("Assistência Social 🤝", color = Color.White, fontSize = 24.sp, fontWeight = FontWeight.Black)
-                Text("Conheça os benefícios que são seus por direito", color = Color.White.copy(alpha = 0.7f), fontSize = 14.sp)
-            }
+    Scaffold(
+        bottomBar = {
+            BarraNavegacaoElo(rotaAtual = "social", aoNavegar = aoNavegar)
         }
-
+    ) { paddingValues ->
         Column(
-            modifier = Modifier.padding(20.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            modifier = Modifier
+                .fillMaxSize()
+                .background(BackgroundLight)
+                .padding(paddingValues)
+                .verticalScroll(rememberScrollState())
         ) {
-            // Card Informativo CadÚnico
-            Column(
+            // Header Azul Escuro
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clip(RoundedCornerShape(16.dp))
-                    .background(Color(0xFFEFF6FF))
-                    .border(1.5.dp, Color(0xFF93C5FD), RoundedCornerShape(16.dp))
-                    .padding(16.dp)
+                    .background(Brush.linearGradient(listOf(Color(0xFF0F4C81), Color(0xFF1D6FA4))))
+                    .statusBarsPadding()
+                    .padding(24.dp)
             ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text("💬", fontSize = 24.sp)
-                    Spacer(modifier = Modifier.width(12.dp))
-                    Text(
-                        "O primeiro passo para acessar a maioria dos benefícios é se cadastrar no CadÚnico. Vá até o CRAS da sua cidade.",
-                        fontSize = 12.sp,
-                        color = Color(0xFF1E40AF),
-                        fontWeight = FontWeight.Medium
-                    )
-                }
-                Spacer(modifier = Modifier.height(12.dp))
-                Button(
-                    onClick = { onNavigate(Screen.CRAS_SEARCH) },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2563EB)),
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(8.dp)
-                ) {
-                    Text("Buscar CRAS mais próximo", color = Color.White, fontWeight = FontWeight.Bold)
+                Column {
+                    Text("Assistência Social 🤝", color = Color.White, fontSize = 24.sp, fontWeight = FontWeight.Black)
+                    Text("Conheça os benefícios que são seus por direito", color = Color.White.copy(alpha = 0.85f), fontSize = 14.sp)
                 }
             }
 
-            // Lista de Benefícios Expansíveis
-            benefits.forEach { b ->
-                val isExpanded = expandedId == b.id
-
+            Column(
+                modifier = Modifier.padding(20.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                // Card Informativo CadÚnico
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
                         .clip(RoundedCornerShape(16.dp))
-                        .background(Color.White)
-                        .border(1.5.dp, if (isExpanded) b.color else Color(0xFFE5E7EB), RoundedCornerShape(16.dp))
+                        .background(Color(0xFFEFF6FF))
+                        .border(1.5.dp, Color(0xFF93C5FD), RoundedCornerShape(16.dp))
+                        .padding(16.dp)
                 ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable { expandedId = if (isExpanded) null else b.id }
-                            .padding(16.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .size(48.dp)
-                                .clip(RoundedCornerShape(12.dp))
-                                .background(b.bg),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(b.icon, fontSize = 24.sp)
-                        }
-
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text("💬", fontSize = 24.sp)
                         Spacer(modifier = Modifier.width(12.dp))
-
-                        Column(modifier = Modifier.weight(1f)) {
-                            Text(b.name, fontSize = 14.sp, fontWeight = FontWeight.Black, color = Color(0xFF1F2937))
-                            Text(b.desc, fontSize = 12.sp, color = Color(0xFF6B7280), maxLines = 1)
-                        }
-
-                        Icon(
-                            imageVector = if (isExpanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
-                            contentDescription = "Expandir",
-                            tint = b.color
+                        Text(
+                            "O primeiro passo para acessar a maioria dos benefícios é se cadastrar no CadÚnico. Vá até o CRAS da sua cidade.",
+                            fontSize = 13.sp,
+                            color = Color(0xFF1E40AF),
+                            fontWeight = FontWeight.Medium,
+                            lineHeight = 18.sp
                         )
                     }
+                    Spacer(modifier = Modifier.height(14.dp))
+                    Button(
+                        onClick = { aoNavegar("cras_search") },
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2563EB)),
+                        modifier = Modifier.fillMaxWidth().height(48.dp),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Icon(Icons.Default.LocationOn, contentDescription = null, modifier = Modifier.size(18.dp))
+                        Spacer(Modifier.width(8.dp))
+                        Text("Buscar CRAS por CEP 📍", color = Color.White, fontWeight = FontWeight.Bold)
+                    }
+                }
 
-                    AnimatedVisibility(visible = isExpanded) {
-                        Column(
+                // Lista de Benefícios Expansíveis
+                benefits.forEach { b ->
+                    val isExpanded = expandedId == b.id
+
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(16.dp))
+                            .background(Color.White)
+                            .border(1.5.dp, if (isExpanded) b.color else Color(0xFFE5E7EB), RoundedCornerShape(16.dp))
+                    ) {
+                        Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(horizontal = 16.dp, vertical = 12.dp),
-                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                                .clickable { expandedId = if (isExpanded) null else b.id }
+                                .padding(16.dp),
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
-                            HorizontalDivider(color = Color(0xFFE5E7EB))
-
-                            Text("Quem tem direito?", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = b.color)
-                            b.requirements.forEach { req ->
-                                Row(verticalAlignment = Alignment.Top) {
-                                    Text("• ", color = b.color, fontWeight = FontWeight.Bold)
-                                    Text(req, fontSize = 12.sp, color = Color(0xFF1F2937))
-                                }
-                            }
-
                             Box(
                                 modifier = Modifier
-                                    .fillMaxWidth()
+                                    .size(48.dp)
                                     .clip(RoundedCornerShape(12.dp))
-                                    .background(b.bg)
-                                    .padding(12.dp)
+                                    .background(b.bg),
+                                contentAlignment = Alignment.Center
                             ) {
-                                Column {
-                                    Text("💰 Valor", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = b.color)
-                                    Text(b.value, fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = Color(0xFF1F2937))
-                                }
+                                Text(b.icon, fontSize = 24.sp)
                             }
 
-                            Box(
+                            Spacer(modifier = Modifier.width(12.dp))
+
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(b.name, fontSize = 15.sp, fontWeight = FontWeight.Black, color = Color(0xFF1F2937))
+                                Text(b.desc, fontSize = 12.sp, color = Color(0xFF6B7280), maxLines = 1)
+                            }
+
+                            Icon(
+                                imageVector = if (isExpanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                                contentDescription = "Expandir",
+                                tint = b.color
+                            )
+                        }
+
+                        AnimatedVisibility(visible = isExpanded) {
+                            Column(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .clip(RoundedCornerShape(12.dp))
-                                    .background(Color(0xFFF8FAFC))
-                                    .border(1.dp, Color(0xFFE5E7EB), RoundedCornerShape(12.dp))
-                                    .padding(12.dp)
+                                    .padding(horizontal = 16.dp, vertical = 12.dp),
+                                verticalArrangement = Arrangement.spacedBy(12.dp)
                             ) {
-                                Column {
-                                    Text("📍 Onde solicitar", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Color(0xFF6B7280))
-                                    Text(b.where, fontSize = 12.sp, color = Color(0xFF1F2937))
+                                HorizontalDivider(color = Color(0xFFE5E7EB))
+
+                                Text("Quem tem direito?", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = b.color)
+                                b.requirements.forEach { req ->
+                                    Row(verticalAlignment = Alignment.Top) {
+                                        Text("• ", color = b.color, fontWeight = FontWeight.Bold)
+                                        Text(req, fontSize = 13.sp, color = Color(0xFF1F2937), lineHeight = 18.sp)
+                                    }
+                                }
+
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .clip(RoundedCornerShape(12.dp))
+                                        .background(b.bg)
+                                        .padding(12.dp)
+                                ) {
+                                    Column {
+                                        Text("💰 Valor", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = b.color)
+                                        Text(b.value, fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = Color(0xFF1F2937))
+                                    }
+                                }
+
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .clip(RoundedCornerShape(12.dp))
+                                        .background(Color(0xFFF8FAFC))
+                                        .border(1.dp, Color(0xFFE5E7EB), RoundedCornerShape(12.dp))
+                                        .padding(12.dp)
+                                ) {
+                                    Column {
+                                        Text("📍 Onde solicitar", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Color(0xFF6B7280))
+                                        Text(b.where, fontSize = 13.sp, color = Color(0xFF1F2937))
+                                    }
                                 }
                             }
                         }
                     }
                 }
+
+                Spacer(Modifier.height(24.dp))
             }
         }
+    }
+
+    // Modal de Informações e Localização do CRAS
+    if (mostrarModalCras) {
+        AlertDialog(
+            onDismissRequest = { mostrarModalCras = false },
+            title = {
+                Text("Como encontrar o CRAS 📍", fontWeight = FontWeight.Bold, fontSize = 18.sp)
+            },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    Text(
+                        "O CRAS (Centro de Referência de Assistência Social) é o local onde você realiza o CadÚnico e solicita benefícios.",
+                        fontSize = 13.sp,
+                        color = TextDark,
+                        lineHeight = 18.sp
+                    )
+
+                    Text(
+                        "📄 Documentos necessários para levar:\n" +
+                                "• RG e CPF de todos da família\n" +
+                                "• Comprovante de Residência\n" +
+                                "• Certidão de Nascimento das crianças\n" +
+                                "• Carteira de Trabalho (se houver)",
+                        fontSize = 12.sp,
+                        color = Color(0xFF4B5563),
+                        lineHeight = 18.sp
+                    )
+
+                    Spacer(Modifier.height(4.dp))
+
+                    Button(
+                        onClick = {
+                            try {
+                                val gmmIntentUri = Uri.parse("geo:0,0?q=CRAS")
+                                val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri)
+                                context.startActivity(mapIntent)
+                            } catch (e: Exception) {
+                                val webIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://www.google.com/maps/search/CRAS"))
+                                context.startActivity(webIntent)
+                            }
+                            mostrarModalCras = false
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2563EB)),
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(10.dp)
+                    ) {
+                        Icon(Icons.Default.LocationOn, null, modifier = Modifier.size(18.dp))
+                        Spacer(Modifier.width(6.dp))
+                        Text("Ver CRAS no Google Maps 🗺️", fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                    }
+
+                    OutlinedButton(
+                        onClick = {
+                            try {
+                                val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://cadunico.dataprev.gov.br/"))
+                                context.startActivity(browserIntent)
+                            } catch (e: Exception) {
+                                e.printStackTrace()
+                            }
+                            mostrarModalCras = false
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(10.dp)
+                    ) {
+                        Icon(Icons.Default.OpenInBrowser, null, modifier = Modifier.size(18.dp))
+                        Spacer(Modifier.width(6.dp))
+                        Text("Acessar Portal do CadÚnico 🌐", fontSize = 13.sp)
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = { mostrarModalCras = false }) {
+                    Text("Fechar")
+                }
+            }
+        )
     }
 }

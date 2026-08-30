@@ -5,6 +5,8 @@ import android.content.SharedPreferences
 import androidx.room.Room
 import br.com.projeto.elo.data.local.AppDatabase
 import br.com.projeto.elo.data.local.MIGRATION_1_2
+import br.com.projeto.elo.data.local.MIGRATION_2_3
+import br.com.projeto.elo.data.local.OrcamentoDao
 import br.com.projeto.elo.data.local.TransacaoDao
 import br.com.projeto.elo.data.remote.GeminiApi
 import dagger.Module
@@ -26,11 +28,14 @@ object AppModule {
     @Singleton
     fun provideAppDatabase(@ApplicationContext context: Context): AppDatabase =
         Room.databaseBuilder(context, AppDatabase::class.java, "elo_banco_de_dados")
-            .addMigrations(MIGRATION_1_2)
+            .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
             .build()
 
     @Provides
     fun provideTransacaoDao(db: AppDatabase): TransacaoDao = db.transacaoDao()
+
+    @Provides
+    fun provideOrcamentoDao(db: AppDatabase): OrcamentoDao = db.orcamentoDao()
 
     @Provides
     @Singleton
@@ -54,11 +59,6 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideSharedPreferences(@ApplicationContext context: Context): SharedPreferences =
-        context.getSharedPreferences("elo_prefs", Context.MODE_PRIVATE)
-
-    @Provides
-    @Singleton
     fun provideViaCepApi(okHttpClient: OkHttpClient): br.com.projeto.elo.data.remote.ViaCepApi =
         Retrofit.Builder()
             .baseUrl("https://viacep.com.br/ws/")
@@ -66,4 +66,9 @@ object AppModule {
             .addConverterFactory(GsonConverterFactory.create())
             .build()
             .create(br.com.projeto.elo.data.remote.ViaCepApi::class.java)
+
+    @Provides
+    @Singleton
+    fun provideSharedPreferences(@ApplicationContext context: Context): SharedPreferences =
+        context.getSharedPreferences("elo_prefs", Context.MODE_PRIVATE)
 }
