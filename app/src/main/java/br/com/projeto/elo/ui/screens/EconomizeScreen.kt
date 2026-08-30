@@ -25,129 +25,126 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import br.com.projeto.elo.ui.theme.* // Importe seus temas (VerdeFundo, VerdeCard, LaranjaBotao, etc.)
-// Importe seu R para os drawables das ilustrações
+import br.com.projeto.elo.ui.components.BarraNavegacaoElo
+import br.com.projeto.elo.ui.theme.*
 import br.com.projeto.elo.R
 import kotlinx.coroutines.launch
-
-// --- ATENÇÃO ---
-// Para testar a UI, descomente as linhas abaixo que simulam os estados do ViewModel.
-// No código real, passe o ViewModel como parâmetro da EconomizeScreen.
 
 /**
  * Tela Economize.
  * Focada em guias de economia e calculadora de KWH com IA.
  */
 @Composable
-fun EconomizeScreen() {
-
-    // --- ESTADOS SIMULADOS DO VIEWMODEL (PARA TESTE DE UI) ---
-    // NO CÓDIGO REAL, PEGUE ISSO DO SEU VIEWMODEL
+fun EconomizeScreen(
+    aoNavegar: (String) -> Unit = {}
+) {
     var queryCalculadora by remember { mutableStateOf("") }
     var respostaCalculadora by remember { mutableStateOf<String?>(null) }
     var carregandoCalculadora by remember { mutableStateOf(false) }
     val composableScope = rememberCoroutineScope()
 
-    // Simulação da função do ViewModel
     fun simularChamadaGemini(pergunta: String) {
         if (pergunta.isBlank()) return
         carregandoCalculadora = true
         respostaCalculadora = null
 
-        // Simula delay e resposta do Gemini
         composableScope.launch {
             kotlinx.coroutines.delay(2000)
             respostaCalculadora = "Com base em médias de mercado, trocar 10 lâmpadas comuns por LED geraria uma economia estimada de aproximadamente **25 kWh por mês**.\n\nIsso representa uma redução de cerca de **R$ 22,50** na sua conta."
             carregandoCalculadora = false
         }
     }
-    // --------------------------------------------------------
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color(0xFFF9FAFB)) // BackgroundLight
-            .verticalScroll(rememberScrollState())
-            .padding(bottom = 90.dp) // Espaço para a bottom bar
-    ) {
-        // Header Verde (Economize)
-        Box(
+    Scaffold(
+        bottomBar = {
+            BarraNavegacaoElo(rotaAtual = "economize", aoNavegar = aoNavegar)
+        }
+    ) { paddingValues ->
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .background(Brush.linearGradient(listOf(Color(0xFF059669), Color(0xFF10B981))))
-                .padding(20.dp)
+                .fillMaxSize()
+                .background(BackgroundLight)
+                .padding(paddingValues)
+                .verticalScroll(rememberScrollState())
         ) {
-            Column(modifier = Modifier.padding(top = 16.dp)) {
-                Text(
-                    "Economize 🌱",
-                    color = Color.White,
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Black
+            // Header Verde (Economize)
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Brush.linearGradient(listOf(Color(0xFF059669), Color(0xFF10B981))))
+                    .statusBarsPadding()
+                    .padding(24.dp)
+            ) {
+                Column(modifier = Modifier.padding(top = 16.dp)) {
+                    Text(
+                        "Economize 🌱",
+                        color = Color.White,
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Black
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        "Pequenas ações, grandes transformações.",
+                        color = Color.White.copy(alpha = 0.8f),
+                        fontSize = 14.sp
+                    )
+                }
+            }
+
+            Column(
+                modifier = Modifier.padding(20.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                SectionTitle(title = "Guia de economia", color = VerdeFundo)
+
+                // ÁGUA
+                ExpandableGuideCard(
+                    title = "Água: Consumo Consciente",
+                    icon = Icons.Default.WaterDrop,
+                    iconTint = Color(0xFF3B82F6),
+                    bgColor = Color(0xFFEFF6FF),
+                    borderColor = Color(0xFFBFDBFE),
+                    shortDescription = "Reduza a conta de água com dicas simples para sua casa."
                 )
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    "Pequenas ações, grandes transformações.",
-                    color = Color.White.copy(alpha = 0.8f),
-                    fontSize = 14.sp
+
+                // ELETRICIDADE
+                ExpandableGuideCard(
+                    title = "Eletricidade: Conta Mais Leve",
+                    icon = Icons.Default.Bolt,
+                    iconTint = Color(0xFFEAB308),
+                    bgColor = Color(0xFFFEFCE8),
+                    borderColor = Color(0xFFFEF08A),
+                    shortDescription = "Poupe energia e mantenha seu dinheiro no bolso."
+                )
+
+                // TECNOLOGIA
+                ExpandableGuideCard(
+                    title = "Tecnologia: Green IT",
+                    icon = Icons.Default.Memory,
+                    iconTint = Color(0xFF10B981),
+                    bgColor = Color(0xFFECFDF5),
+                    borderColor = Color(0xFFA7F3D0),
+                    shortDescription = "Aprenda a usar a IA de forma eficiente e sustentável."
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                // --- CALCULADORA DE ECONOMIA ---
+                SectionTitle(title = "Calculadora de economia de KWH", color = VerdeFundo)
+
+                CalculadoraEconomiaAiCard(
+                    query = queryCalculadora,
+                    onQueryChanged = { queryCalculadora = it },
+                    response = respostaCalculadora,
+                    isLoading = carregandoCalculadora,
+                    onCalculateClick = { simularChamadaGemini(queryCalculadora) }
                 )
             }
-        }
-
-        Column(
-            modifier = Modifier.padding(20.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            SectionTitle(title = "Guia de economia", color = VerdeFundo)
-
-            // ÁGUA
-            ExpandableGuideCard(
-                title = "Água: Consumo Consciente",
-                icon = Icons.Default.WaterDrop,
-                iconTint = Color(0xFF3B82F6),
-                bgColor = Color(0xFFEFF6FF),
-                borderColor = Color(0xFFBFDBFE),
-                shortDescription = "Reduza a conta de água com dicas simples para sua casa."
-            )
-
-            // ELETRICIDADE
-            ExpandableGuideCard(
-                title = "Eletricidade: Conta Mais Leve",
-                icon = Icons.Default.Bolt,
-                iconTint = Color(0xFFEAB308),
-                bgColor = Color(0xFFFEFCE8),
-                borderColor = Color(0xFFFEF08A),
-                shortDescription = "Poupe energia e mantenha seu dinheiro no bolso."
-            )
-
-            // TECNOLOGIA
-            ExpandableGuideCard(
-                title = "Tecnologia: Green IT",
-                icon = Icons.Default.Memory,
-                iconTint = Color(0xFF10B981),
-                bgColor = Color(0xFFECFDF5),
-                borderColor = Color(0xFFA7F3D0),
-                shortDescription = "Aprenda a usar a IA de forma eficiente e sustentável."
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            // --- NOVA SEÇÃO: CALCULADORA DE ECONOMIA ---
-            // Mesma formatação de "Guia de economia"
-            SectionTitle(title = "Calculadora de economia de KWH", color = VerdeFundo)
-
-            CalculadoraEconomiaAiCard(
-                query = queryCalculadora,
-                onQueryChanged = { queryCalculadora = it }, // viewModel::atualizarQueryCalculadora
-                response = respostaCalculadora,
-                isLoading = carregandoCalculadora,
-                onCalculateClick = { simularChamadaGemini(queryCalculadora) } // viewModel::calcularEconomiaAi
-            )
         }
     }
 }
@@ -187,7 +184,6 @@ private fun CalculadoraEconomiaAiCard(
         Column(
             modifier = Modifier.padding(16.dp)
         ) {
-            // Cabeçalho da Calculadora com ícone de IA
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
                     imageVector = Icons.Default.AutoAwesome,
@@ -206,7 +202,6 @@ private fun CalculadoraEconomiaAiCard(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // Campo de Input do Usuário
             OutlinedTextField(
                 value = query,
                 onValueChange = onQueryChanged,
@@ -234,7 +229,7 @@ private fun CalculadoraEconomiaAiCard(
                     focusedBorderColor = LaranjaBotao,
                     unfocusedBorderColor = Color.LightGray
                 ),
-                singleLine = false, // Permite múltiplas linhas se a pergunta for longa
+                singleLine = false,
                 maxLines = 3
             )
 
@@ -264,7 +259,7 @@ private fun CalculadoraEconomiaAiCard(
                 }
             }
 
-            // Área de Resposta do Gemini (só aparece se houver resposta ou loading)
+            // Área de Resposta do Gemini
             if (response != null || isLoading) {
                 Spacer(modifier = Modifier.height(16.dp))
                 HorizontalDivider(color = Color.LightGray.copy(alpha = 0.3f))
@@ -287,7 +282,6 @@ private fun CalculadoraEconomiaAiCard(
                             modifier = Modifier.fillMaxWidth()
                         )
                     } else if (response != null) {
-                        // Resposta formatada do Gemini
                         Row {
                             Icon(
                                 imageVector = Icons.Default.AutoAwesome,
@@ -310,8 +304,6 @@ private fun CalculadoraEconomiaAiCard(
     }
 }
 
-// ---- COMPONENTES DOS GUIAS (CÓDIGO JÁ EXISTENTE, MANTIDO PARA CONTEXTO) ----
-
 /**
  * Card de guia que exibe detalhes em um Popup (Dialog) ao ser clicado.
  */
@@ -331,7 +323,6 @@ private fun ExpandableGuideCard(
     if (showDialog) {
         AlertDialog(
             onDismissRequest = { showDialog = false },
-            // ESSENCIAL: Desativa a limitação de largura padrão do Android
             properties = androidx.compose.ui.window.DialogProperties(usePlatformDefaultWidth = false),
 
             icon = {
@@ -348,11 +339,11 @@ private fun ExpandableGuideCard(
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color(0xFF1F2937),
-                    textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                    textAlign = TextAlign.Center
                 )
             },
             modifier = Modifier
-                .fillMaxWidth(0.92f) // Ocupa 92% da tela horizontalmente
+                .fillMaxWidth(0.92f)
                 .wrapContentHeight()
                 .padding(16.dp),
             shape = RoundedCornerShape(24.dp),
@@ -363,7 +354,7 @@ private fun ExpandableGuideCard(
                         .fillMaxWidth()
                         .padding(top = 8.dp)
                         .verticalScroll(rememberScrollState()),
-                    verticalArrangement = Arrangement.spacedBy(20.dp) // Espaço maior entre os tópicos
+                    verticalArrangement = Arrangement.spacedBy(20.dp)
                 ) {
                     HorizontalDivider(color = borderColor)
 
@@ -404,10 +395,9 @@ private fun ExpandableGuideCard(
                             Pair(R.drawable.eula, "Leitura de Contratos (EULA): Precisa que a IA analise Termos de Uso ou contratos longos? Envie apenas o trecho da sua dúvida. Enviar o documento gigante a cada pergunta gasta energia desnecessária e sobrecarrega a rede de dados global."),
                             Pair(R.drawable.cache_ia, "Aproveite o Cache (Contexto): Sempre que possível, continue no mesmo chat em vez de criar um novo e reenviar os mesmos arquivos. O sistema reaproveita o contexto salvo, economizando drasticamente os recursos dos Data Centers! Fazer escolhas inteligentes no digital também é sustentabilidade.")
                         )
-                        else -> emptyList() // Fallback
+                        else -> emptyList()
                     }
 
-                    // Renderiza cada item com imagem e texto
                     guideItems.forEach { (imageRes, itemText) ->
                         GuideItem(imageRes = imageRes, text = itemText)
                     }
@@ -430,7 +420,6 @@ private fun ExpandableGuideCard(
             .clip(RoundedCornerShape(16.dp))
             .background(bgColor)
             .border(1.dp, borderColor, RoundedCornerShape(16.dp))
-            // Ao clicar, muda o estado para mostrar o popup
             .clickable { showDialog = true }
             .padding(16.dp)
     ) {
@@ -475,15 +464,15 @@ private fun ExpandableGuideCard(
 private fun GuideItem(@androidx.annotation.DrawableRes imageRes: Int, text: String) {
     Column(
         modifier = Modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally // Centraliza a imagem abaixo do texto
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "• $text", // Bullet point adicionado direto no texto
+            text = "• $text",
             modifier = Modifier.fillMaxWidth(),
             fontSize = 14.sp,
             color = Color(0xFF4B5563), // TextMuted
             lineHeight = 22.sp,
-            textAlign = androidx.compose.ui.text.style.TextAlign.Start
+            textAlign = TextAlign.Start
         )
 
         Spacer(modifier = Modifier.height(12.dp))
@@ -491,10 +480,10 @@ private fun GuideItem(@androidx.annotation.DrawableRes imageRes: Int, text: Stri
         Image(
             painter = androidx.compose.ui.res.painterResource(id = imageRes),
             contentDescription = null,
-            contentScale = androidx.compose.ui.layout.ContentScale.Fit,
+            contentScale = ContentScale.Fit,
             modifier = Modifier
-                .fillMaxWidth(0.8f) // Imagem ocupa 80% da largura do card
-                .height(110.dp) // Altura fixa
+                .fillMaxWidth(0.8f)
+                .height(110.dp)
                 .clip(RoundedCornerShape(12.dp))
                 .padding(8.dp)
         )
