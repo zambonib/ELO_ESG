@@ -145,31 +145,49 @@ class DashboardViewModel @Inject constructor(
 
     fun registrarGastoComInteligencia(textoDoUsuario: String) {
         viewModelScope.launch {
-            _carregandoIa.value = true
-            try {
-                val instrucao = """
-                    Você é o cérebro de um app financeiro. O usuário enviou: "$textoDoUsuario"
-                    Analise se é uma entrada de dinheiro (RECEITA) ou saída (DESPESA).
-                    Extraia o valor numérico, gere uma descrição curta e defina a categoria.
-                    Retorne APENAS um JSON válido, sem texto extra.
-                    Exemplo 1: {"descricao":"Mercado","valor":50.0,"categoria":"Alimentação","tipo":"DESPESA"}
-                    Exemplo 2: {"descricao":"Salário","valor":2000.0,"categoria":"Renda","tipo":"RECEITA"}
-                """.trimIndent()
-                val request = GeminiRequest(listOf(Content(listOf(Part(instrucao)))))
-                val resposta = geminiApi.classificarTransacao(BuildConfig.GEMINI_API_KEY, request)
-                val textoResposta = resposta.candidates?.firstOrNull()?.content?.parts?.firstOrNull()?.text
-                if (textoResposta != null) {
-                    val jsonLimpo = textoResposta.replace("```json", "").replace("```", "").trim()
-                    val transacaoSemUsuario = Gson().fromJson(jsonLimpo, Transacao::class.java)
-                    transacaoDao.inserirTransacao(
-                        transacaoSemUsuario.copy(usuarioId = uid, data = System.currentTimeMillis())
-                    )
-                    Toast.makeText(getApplication(), "✅ Lançamento salvo!", Toast.LENGTH_SHORT).show()
+            var tentativas = 0
+            var sucesso = false
+            while (tentativas < 2 && !sucesso) {
+                try {
+                    tentativas++
+                    val instrucao = """
+                        Você é o cérebro de um app financeiro. O usuário enviou: "$textoDoUsuario"
+                        Analise se é uma entrada de dinheiro (RECEITA) ou saída (DESPESA).
+                        Extraia o valor numérico, gere uma descrição curta e defina a categoria.
+                        Retorne APENAS um JSON válido, sem texto extra.
+                        Exemplo 1: {"descricao":"Mercado","valor":50.0,"categoria":"Alimentação","tipo":"DESPESA"}
+                        Exemplo 2: {"descricao":"Salário","valor":2000.0,"categoria":"Renda","tipo":"RECEITA"}
+                    """.trimIndent()
+                    val request = GeminiRequest(listOf(Content(listOf(Part(instrucao)))))
+                    val resposta = geminiApi.classificarTransacao(BuildConfig.GEMINI_API_KEY, request)
+                    val textoResposta = resposta.candidates?.firstOrNull()?.content?.parts?.firstOrNull()?.text
+                    if (textoResposta != null) {
+                        val jsonLimpo = textoResposta.replace("```json", "").replace("```", "").trim()
+                        val transacaoSemUsuario = Gson().fromJson(jsonLimpo, Transacao::class.java)
+                        transacaoDao.inserirTransacao(
+                            transacaoSemUsuario.copy(usuarioId = uid, data = System.currentTimeMillis())
+                        )
+                        Toast.makeText(getApplication(), "✅ Lançamento salvo!", Toast.LENGTH_SHORT).show()
+                        sucesso = true
+                    }
+                } catch (e: Exception) {
+                    if (tentativas < 2 && e.message?.contains("503") == true) {
+                        kotlinx.coroutines.delay(1000) // Aguarda 1s e tenta de novo automaticamente
+                    } else {
+                        val msg = when {
+                            e.message?.contains("503") == true ->
+                                "Servidor da IA temporariamente sobrecarregado. Tente novamente em alguns segundos."
+                            e.message?.contains("404") == true ->
+                                "Modelo da IA não encontrado. Verifique a conexão."
+                            else -> "Erro na IA: ${e.message}"
+                        }
+                        Toast.makeText(getApplication(), msg, Toast.LENGTH_LONG).show()
+                    }
+                } finally {
+                    if (sucesso || tentativas >= 2) {
+                        _carregandoIa.value = false
+                    }
                 }
-            } catch (e: Exception) {
-                Toast.makeText(getApplication(), "Erro na IA: ${e.message}", Toast.LENGTH_LONG).show()
-            } finally {
-                _carregandoIa.value = false
             }
         }
     }

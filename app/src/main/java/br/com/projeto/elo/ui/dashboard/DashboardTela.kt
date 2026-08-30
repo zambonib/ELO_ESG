@@ -121,7 +121,7 @@ fun DashboardTela(
             NavigationBar(containerColor = Color.White, tonalElevation = 8.dp) {
                 val activeColors = NavigationBarItemDefaults.colors(selectedIconColor = VerdeFundo, selectedTextColor = VerdeFundo, indicatorColor = Color.Transparent)
                 NavigationBarItem(selected = abaSelecionada == 0, onClick = { abaSelecionada = 0 }, icon = { Icon(Icons.Default.Home, "") }, label = { Text("Início", maxLines = 1, fontSize = 10.sp) }, colors = activeColors)
-                NavigationBarItem(selected = abaSelecionada == 1, onClick = { abaSelecionada = 1 }, icon = { Icon(Icons.Default.MenuBook, "") }, label = { Text("Trilha", maxLines = 1, fontSize = 10.sp) }, colors = activeColors)
+                NavigationBarItem(selected = abaSelecionada == 1, onClick = { abaSelecionada = 1 }, icon = { Icon(Icons.Default.MenuBook, "") }, label = { Text("Educação", maxLines = 1, fontSize = 9.sp) }, colors = activeColors)
                 NavigationBarItem(selected = abaSelecionada == 2, onClick = { abaSelecionada = 2 }, icon = { Icon(Icons.Default.AccountBalanceWallet, "") }, label = { Text("Finanças", maxLines = 1, fontSize = 10.sp) }, colors = activeColors)
                 NavigationBarItem(selected = abaSelecionada == 3, onClick = { abaSelecionada = 3 }, icon = { Icon(Icons.Default.EmojiEvents, "") }, label = { Text("Conquistas", maxLines = 1, fontSize = 9.sp) }, colors = activeColors)
                 NavigationBarItem(selected = abaSelecionada == 4, onClick = { abaSelecionada = 4 }, icon = { Icon(Icons.Default.Eco, "") }, label = { Text("Economize", maxLines = 1, fontSize = 9.sp) }, colors = activeColors)
@@ -296,7 +296,7 @@ fun DashboardTela(
             }
                     }
                 }
-                1 -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { Text("Trilha: Em breve...") }
+                1 -> br.com.projeto.elo.ui.screens.EducationScreen()
                 2 -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { Text("Finanças: Em breve...") }
                 3 -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { Text("Conquistas: Em breve...") }
                 4 -> br.com.projeto.elo.ui.screens.EconomizeScreen()
