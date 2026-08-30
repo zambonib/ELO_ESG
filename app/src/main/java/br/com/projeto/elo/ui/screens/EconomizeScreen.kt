@@ -1,19 +1,21 @@
 package br.com.projeto.elo.ui.screens
 
-import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ExpandLess
-import androidx.compose.material.icons.filled.ExpandMore
+import androidx.compose.material.icons.filled.AutoAwesome
+import androidx.compose.material.icons.filled.Bolt
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Memory
 import androidx.compose.material.icons.filled.WaterDrop
-import androidx.compose.material.icons.filled.Bolt
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -22,23 +24,57 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import br.com.projeto.elo.ui.theme.*
+import br.com.projeto.elo.ui.theme.* // Importe seus temas (VerdeFundo, VerdeCard, LaranjaBotao, etc.)
+// Importe seu R para os drawables das ilustrações
+import br.com.projeto.elo.R
+import kotlinx.coroutines.launch
+
+// --- ATENÇÃO ---
+// Para testar a UI, descomente as linhas abaixo que simulam os estados do ViewModel.
+// No código real, passe o ViewModel como parâmetro da EconomizeScreen.
 
 /**
  * Tela Economize.
- * Focada em guias de economia: Água, Eletricidade e Tecnologia.
+ * Focada em guias de economia e calculadora de KWH com IA.
  */
 @Composable
 fun EconomizeScreen() {
+
+    // --- ESTADOS SIMULADOS DO VIEWMODEL (PARA TESTE DE UI) ---
+    // NO CÓDIGO REAL, PEGUE ISSO DO SEU VIEWMODEL
+    var queryCalculadora by remember { mutableStateOf("") }
+    var respostaCalculadora by remember { mutableStateOf<String?>(null) }
+    var carregandoCalculadora by remember { mutableStateOf(false) }
+    val composableScope = rememberCoroutineScope()
+
+    // Simulação da função do ViewModel
+    fun simularChamadaGemini(pergunta: String) {
+        if (pergunta.isBlank()) return
+        carregandoCalculadora = true
+        respostaCalculadora = null
+
+        // Simula delay e resposta do Gemini
+        composableScope.launch {
+            kotlinx.coroutines.delay(2000)
+            respostaCalculadora = "Com base em médias de mercado, trocar 10 lâmpadas comuns por LED geraria uma economia estimada de aproximadamente **25 kWh por mês**.\n\nIsso representa uma redução de cerca de **R$ 22,50** na sua conta."
+            carregandoCalculadora = false
+        }
+    }
+    // --------------------------------------------------------
+
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFFF9FAFB)) // BackgroundLight
             .verticalScroll(rememberScrollState())
-            .padding(bottom = 90.dp)
+            .padding(bottom = 90.dp) // Espaço para a bottom bar
     ) {
         // Header Verde (Economize)
         Box(
@@ -76,11 +112,7 @@ fun EconomizeScreen() {
                 iconTint = Color(0xFF3B82F6),
                 bgColor = Color(0xFFEFF6FF),
                 borderColor = Color(0xFFBFDBFE),
-                shortDescription = "Reduza a conta de água com dicas simples para sua casa.",
-                detailedContent = "Guias práticos de consumo consciente geram um duplo impacto real: reduzem a pegada ecológica da sua família e criam economia imediata no orçamento doméstico.\n\n" +
-                        "• Cheque vazamentos regularmente.\n" +
-                        "• Reduza o tempo no banho (1 minuto a menos faz diferença!).\n" +
-                        "• O dinheiro economizado sobra para a subsistência da sua família."
+                shortDescription = "Reduza a conta de água com dicas simples para sua casa."
             )
 
             // ELETRICIDADE
@@ -90,11 +122,7 @@ fun EconomizeScreen() {
                 iconTint = Color(0xFFEAB308),
                 bgColor = Color(0xFFFEFCE8),
                 borderColor = Color(0xFFFEF08A),
-                shortDescription = "Poupe energia e mantenha seu dinheiro no bolso.",
-                detailedContent = "Diferente de falsas ilusões financeiras geradas por simuladores de investimentos de curto prazo, economizar energia é um ganho garantido, ético e sem riscos.\n\n" +
-                        "• Troque lâmpadas antigas por LED.\n" +
-                        "• Desligue aparelhos em stand-by.\n" +
-                        "• Uma conta de luz mais barata significa mais recursos para sua rotina diária."
+                shortDescription = "Poupe energia e mantenha seu dinheiro no bolso."
             )
 
             // TECNOLOGIA
@@ -104,15 +132,27 @@ fun EconomizeScreen() {
                 iconTint = Color(0xFF10B981),
                 bgColor = Color(0xFFECFDF5),
                 borderColor = Color(0xFFA7F3D0),
-                shortDescription = "Aprenda a usar a Inteligência Artificial de forma eficiente e sustentável.",
-                detailedContent = "Você sabia que o uso de IA consome energia real (e muita água!) em servidores pelo mundo? Veja como você pode economizar recursos:\n\n" +
-                        "• Seja Objetivo: Ao enviar mensagens (prompts) para a IA, seja direto e evite informações repetitivas. Isso poupa 'tokens' e reduz o esforço de processamento.\n" +
-                        "• Leitura de Contratos (EULA): Precisa que a IA analise Termos de Uso ou contratos longos? Envie apenas o trecho da sua dúvida. Enviar o documento gigante a cada pergunta gasta energia desnecessária.\n" +
-                        "• Aproveite o Cache (Contexto): Sempre que possível, continue no mesmo chat em vez de criar um novo e reenviar os mesmos arquivos. O sistema reaproveita o contexto salvo, economizando drasticamente os recursos dos Data Centers!"
+                shortDescription = "Aprenda a usar a IA de forma eficiente e sustentável."
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // --- NOVA SEÇÃO: CALCULADORA DE ECONOMIA ---
+            // Mesma formatação de "Guia de economia"
+            SectionTitle(title = "Calculadora de economia de KWH", color = VerdeFundo)
+
+            CalculadoraEconomiaAiCard(
+                query = queryCalculadora,
+                onQueryChanged = { queryCalculadora = it }, // viewModel::atualizarQueryCalculadora
+                response = respostaCalculadora,
+                isLoading = carregandoCalculadora,
+                onCalculateClick = { simularChamadaGemini(queryCalculadora) } // viewModel::calcularEconomiaAi
             )
         }
     }
 }
+
+// --- COMPONENTES AUXILIARES ---
 
 @Composable
 private fun SectionTitle(title: String, color: Color) {
@@ -125,6 +165,156 @@ private fun SectionTitle(title: String, color: Color) {
     )
 }
 
+/**
+ * Card contendo a calculadora de economia baseada em IA.
+ */
+@Composable
+private fun CalculadoraEconomiaAiCard(
+    query: String,
+    onQueryChanged: (String) -> Unit,
+    response: String?,
+    isLoading: Boolean,
+    onCalculateClick: () -> Unit
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .border(1.dp, Color.LightGray.copy(alpha = 0.5f), RoundedCornerShape(16.dp)),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        shape = RoundedCornerShape(16.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp)
+        ) {
+            // Cabeçalho da Calculadora com ícone de IA
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    imageVector = Icons.Default.AutoAwesome,
+                    contentDescription = null,
+                    tint = LaranjaBotao,
+                    modifier = Modifier.size(20.dp)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = "Pergunte ao Elo quanto você pode economizar",
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFF1F2937) // TextDark
+                )
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            // Campo de Input do Usuário
+            OutlinedTextField(
+                value = query,
+                onValueChange = onQueryChanged,
+                modifier = Modifier.fillMaxWidth(),
+                placeholder = {
+                    Text(
+                        text = "Ex: \"Quanto economizo trocando 10 lâmpadas por LED?\"",
+                        fontSize = 13.sp,
+                        color = Color.Gray
+                    )
+                },
+                shape = RoundedCornerShape(12.dp),
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+                keyboardActions = KeyboardActions(
+                    onSearch = { if (!isLoading) onCalculateClick() }
+                ),
+                trailingIcon = {
+                    if (query.isNotEmpty()) {
+                        IconButton(onClick = { onQueryChanged("") }) {
+                            Icon(Icons.Default.Close, contentDescription = "Limpar", tint = Color.Gray)
+                        }
+                    }
+                },
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = LaranjaBotao,
+                    unfocusedBorderColor = Color.LightGray
+                ),
+                singleLine = false, // Permite múltiplas linhas se a pergunta for longa
+                maxLines = 3
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            // Botão de Calcular
+            Button(
+                onClick = onCalculateClick,
+                modifier = Modifier.fillMaxWidth(),
+                enabled = query.isNotBlank() && !isLoading,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = LaranjaBotao,
+                    contentColor = Color.White,
+                    disabledContainerColor = Color.LightGray
+                ),
+                shape = RoundedCornerShape(12.dp),
+                contentPadding = PaddingValues(vertical = 12.dp)
+            ) {
+                if (isLoading) {
+                    CircularProgressIndicator(modifier = Modifier.size(20.dp), color = Color.White, strokeWidth = 2.dp)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("O Elo está calculando...", fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                } else {
+                    Icon(Icons.Default.AutoAwesome, contentDescription = null, modifier = Modifier.size(18.dp))
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Calcular Economia com IA", fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                }
+            }
+
+            // Área de Resposta do Gemini (só aparece se houver resposta ou loading)
+            if (response != null || isLoading) {
+                Spacer(modifier = Modifier.height(16.dp))
+                HorizontalDivider(color = Color.LightGray.copy(alpha = 0.3f))
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(Color(0xFFF9FAFB)) // Fundo cinza claro para a resposta
+                        .border(1.dp, Color.LightGray.copy(alpha = 0.5f), RoundedCornerShape(12.dp))
+                        .padding(16.dp)
+                ) {
+                    if (isLoading) {
+                        Text(
+                            text = "Aguarde, analisando sua pergunta...",
+                            fontSize = 13.sp,
+                            color = Color.Gray,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    } else if (response != null) {
+                        // Resposta formatada do Gemini
+                        Row {
+                            Icon(
+                                imageVector = Icons.Default.AutoAwesome,
+                                contentDescription = null,
+                                tint = LaranjaBotao,
+                                modifier = Modifier.size(16.dp).padding(top = 2.dp)
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = response,
+                                fontSize = 13.sp,
+                                color = Color(0xFF4B5563), // TextMuted
+                                lineHeight = 20.sp
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+// ---- COMPONENTES DOS GUIAS (CÓDIGO JÁ EXISTENTE, MANTIDO PARA CONTEXTO) ----
+
+/**
+ * Card de guia que exibe detalhes em um Popup (Dialog) ao ser clicado.
+ */
 @Composable
 private fun ExpandableGuideCard(
     title: String,
@@ -132,55 +322,140 @@ private fun ExpandableGuideCard(
     iconTint: Color,
     bgColor: Color,
     borderColor: Color,
-    shortDescription: String,
-    detailedContent: String
+    shortDescription: String
 ) {
-    var expanded by remember { mutableStateOf(false) }
+    // Estado para controlar a exibição do popup
+    var showDialog by remember { mutableStateOf(false) }
 
+    // Popup (Dialog) com as informações detalhadas
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = { showDialog = false },
+            // ESSENCIAL: Desativa a limitação de largura padrão do Android
+            properties = androidx.compose.ui.window.DialogProperties(usePlatformDefaultWidth = false),
+
+            icon = {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    tint = iconTint,
+                    modifier = Modifier.size(28.dp)
+                )
+            },
+            title = {
+                Text(
+                    text = title,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFF1F2937),
+                    textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                )
+            },
+            modifier = Modifier
+                .fillMaxWidth(0.92f) // Ocupa 92% da tela horizontalmente
+                .wrapContentHeight()
+                .padding(16.dp),
+            shape = RoundedCornerShape(24.dp),
+            containerColor = Color.White,
+            text = {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 8.dp)
+                        .verticalScroll(rememberScrollState()),
+                    verticalArrangement = Arrangement.spacedBy(20.dp) // Espaço maior entre os tópicos
+                ) {
+                    HorizontalDivider(color = borderColor)
+
+                    // TEXTO INTRODUTÓRIO
+                    val introText = when (title) {
+                        "Água: Consumo Consciente" -> "Guias práticos de consumo consciente geram um duplo impacto real: reduzem a pegada ecológica da sua família e criam economia imediata no orçamento doméstico."
+                        "Eletricidade: Conta Mais Leve" -> "Diferente de falsas ilusões financeiras geradas por simuladores de investimentos de curto prazo, economizar energia é um ganho garantido, ético e sem riscos."
+                        "Tecnologia: Green IT" -> "Você sabia que o uso de IA consome energia real (e muita água!) em servidores pelo mundo? Veja como você pode economizar recursos:"
+                        else -> ""
+                    }
+
+                    if (introText.isNotEmpty()) {
+                        Text(
+                            text = introText,
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color(0xFF4B5563),
+                            lineHeight = 24.sp
+                        )
+                        Spacer(modifier = Modifier.height(12.dp))
+                        HorizontalDivider(color = borderColor)
+                    }
+
+                    // LISTA DE TÓPICOS COM IMAGENS
+                    val guideItems = when (title) {
+                        "Água: Consumo Consciente" -> listOf(
+                            Pair(R.drawable.vazamento, "Cheque vazamentos regularmente. Um pequeno gotejamento na torneira ou na válvula do vaso sanitário pode desperdiçar dezenas de litros por dia, inflando sua conta no final do mês sem que você perceba."),
+                            Pair(R.drawable.banho, "Reduza o tempo no banho (1 minuto a menos faz diferença!). Além de economizar milhares de litros de água por mês em uma residência, você também reduz drasticamente o consumo de energia se utilizar chuveiro elétrico."),
+                            Pair(R.drawable.economia, "O dinheiro economizado sobra para a subsistência da sua família. Pequenas mudanças de hábito geram uma economia cumulativa que, ao final de um ano, representa um alívio financeiro significativo para investir no que realmente importa.")
+                        )
+                        "Eletricidade: Conta Mais Leve" -> listOf(
+                            Pair(R.drawable.led, "Troque lâmpadas antigas por LED. Elas consomem até 80% menos energia, possuem uma vida útil muito maior e não aquecem o ambiente, o que ajuda a manter a casa mais fresca."),
+                            Pair(R.drawable.standby, "Desligue aparelhos em stand-by. Equipamentos conectados na tomada, mesmo desligados (como micro-ondas, TVs e carregadores), continuam consumindo energia de forma silenciosa. Retire-os da tomada quando não estiverem em uso."),
+                            Pair(R.drawable.recursos, "Uma conta de luz mais barata significa mais recursos para sua rotina diária. Cada quilowatt-hora poupado é dinheiro que permanece no seu bolso, garantindo um orçamento mais folgado e seguro contra reajustes tarifários.")
+                        )
+                        "Tecnologia: Green IT" -> listOf(
+                            Pair(R.drawable.objetividade, "Seja Objetivo: Ao enviar mensagens (prompts) para a IA, seja direto e evite informações repetitivas. Isso poupa 'tokens' e reduz o esforço de processamento. Lembre-se de que cada interação aciona servidores físicos que consomem eletricidade e água para resfriamento."),
+                            Pair(R.drawable.eula, "Leitura de Contratos (EULA): Precisa que a IA analise Termos de Uso ou contratos longos? Envie apenas o trecho da sua dúvida. Enviar o documento gigante a cada pergunta gasta energia desnecessária e sobrecarrega a rede de dados global."),
+                            Pair(R.drawable.cache_ia, "Aproveite o Cache (Contexto): Sempre que possível, continue no mesmo chat em vez de criar um novo e reenviar os mesmos arquivos. O sistema reaproveita o contexto salvo, economizando drasticamente os recursos dos Data Centers! Fazer escolhas inteligentes no digital também é sustentabilidade.")
+                        )
+                        else -> emptyList() // Fallback
+                    }
+
+                    // Renderiza cada item com imagem e texto
+                    guideItems.forEach { (imageRes, itemText) ->
+                        GuideItem(imageRes = imageRes, text = itemText)
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = { showDialog = false }
+                ) {
+                    Text("Fechar", color = iconTint, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                }
+            }
+        )
+    }
+
+    // Design do Card principal
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(16.dp))
             .background(bgColor)
             .border(1.dp, borderColor, RoundedCornerShape(16.dp))
-            .clickable { expanded = !expanded }
+            // Ao clicar, muda o estado para mostrar o popup
+            .clickable { showDialog = true }
             .padding(16.dp)
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f)) {
-                Box(
-                    modifier = Modifier
-                        .size(40.dp)
-                        .clip(RoundedCornerShape(10.dp))
-                        .background(Color.White)
-                        .border(1.dp, borderColor, RoundedCornerShape(10.dp)),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector = icon,
-                        contentDescription = null,
-                        tint = iconTint,
-                        modifier = Modifier.size(24.dp)
-                    )
-                }
-                Spacer(modifier = Modifier.width(12.dp))
-                Column {
-                    Text(
-                        text = title,
-                        fontSize = 15.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color(0xFF1F2937) // TextDark
-                    )
-                }
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Box(
+                modifier = Modifier
+                    .size(40.dp)
+                    .clip(RoundedCornerShape(10.dp))
+                    .background(Color.White)
+                    .border(1.dp, borderColor, RoundedCornerShape(10.dp)),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    tint = iconTint,
+                    modifier = Modifier.size(24.dp)
+                )
             }
-            Icon(
-                imageVector = if (expanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
-                contentDescription = if (expanded) "Recolher" else "Expandir",
-                tint = iconTint
+            Spacer(modifier = Modifier.width(12.dp))
+            Text(
+                text = title,
+                fontSize = 15.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color(0xFF1F2937) // TextDark
             )
         }
 
@@ -193,19 +468,35 @@ private fun ExpandableGuideCard(
             fontWeight = FontWeight.Medium,
             lineHeight = 18.sp
         )
+    }
+}
 
-        AnimatedVisibility(visible = expanded) {
-            Column {
-                Spacer(modifier = Modifier.height(12.dp))
-                HorizontalDivider(color = borderColor)
-                Spacer(modifier = Modifier.height(12.dp))
-                Text(
-                    text = detailedContent,
-                    fontSize = 13.sp,
-                    color = Color(0xFF6B7280), // TextMuted
-                    lineHeight = 20.sp
-                )
-            }
-        }
+@Composable
+private fun GuideItem(@androidx.annotation.DrawableRes imageRes: Int, text: String) {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally // Centraliza a imagem abaixo do texto
+    ) {
+        Text(
+            text = "• $text", // Bullet point adicionado direto no texto
+            modifier = Modifier.fillMaxWidth(),
+            fontSize = 14.sp,
+            color = Color(0xFF4B5563), // TextMuted
+            lineHeight = 22.sp,
+            textAlign = androidx.compose.ui.text.style.TextAlign.Start
+        )
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        Image(
+            painter = androidx.compose.ui.res.painterResource(id = imageRes),
+            contentDescription = null,
+            contentScale = androidx.compose.ui.layout.ContentScale.Fit,
+            modifier = Modifier
+                .fillMaxWidth(0.8f) // Imagem ocupa 80% da largura do card
+                .height(110.dp) // Altura fixa
+                .clip(RoundedCornerShape(12.dp))
+                .padding(8.dp)
+        )
     }
 }
