@@ -1,6 +1,7 @@
 package br.com.projeto.elo.ui.cras
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -40,7 +41,7 @@ fun CrasSearchScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Buscar CRAS Próximo", fontWeight = FontWeight.Bold) },
+                title = { Text("Buscar CRAS PrÃ³ximo", fontWeight = FontWeight.Bold) },
                 navigationIcon = {
                     IconButton(onClick = aoVoltar) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Voltar")
@@ -63,7 +64,7 @@ fun CrasSearchScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Text(
-                "Digite seu CEP para encontrar as unidades do CRAS mais próximas da sua residência.",
+                "Digite seu CEP para encontrar as unidades do CRAS mais prÃ³ximas da sua residÃªncia.",
                 color = Color.Gray,
                 fontSize = 14.sp
             )
@@ -71,7 +72,7 @@ fun CrasSearchScreen(
             OutlinedTextField(
                 value = cepDigitado,
                 onValueChange = { viewModel.onCepChanged(it) },
-                label = { Text("CEP (somente números)") },
+                label = { Text("CEP (somente nÃºmeros)") },
                 placeholder = { Text("Ex: 01001000") },
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Number,
@@ -123,7 +124,7 @@ fun CrasSearchScreen(
 
             if (enderecoEncontrado != null) {
                 Text(
-                    text = "📍 $enderecoEncontrado",
+                    text = "ðŸ“ $enderecoEncontrado",
                     fontSize = 13.sp,
                     color = Color(0xFF047857),
                     fontWeight = FontWeight.SemiBold,
@@ -142,14 +143,15 @@ fun CrasSearchScreen(
                         Card(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .androidx.compose.foundation.clickable {
+                                .clickable {
                                     if (cras.latitude != null && cras.longitude != null) {
-                                        val uri = android.net.Uri.parse("geo:0,0?q=${cras.latitude},${cras.longitude}(${android.net.Uri.encode(cras.nome)})")
+                                        val origem = android.net.Uri.encode(enderecoEncontrado ?: cepDigitado)
+                                        val uri = android.net.Uri.parse("https://www.google.com/maps/dir/?api=1&origin=$origem&destination=${cras.latitude},${cras.longitude}")
                                         val intent = android.content.Intent(android.content.Intent.ACTION_VIEW, uri)
                                         try {
                                             context.startActivity(intent)
                                         } catch (e: Exception) {
-                                            // Caso não tenha app de mapas instalado
+                                            // Caso nÃ£o tenha app de mapas instalado
                                         }
                                     }
                                 },
@@ -175,7 +177,7 @@ fun CrasSearchScreen(
                                     Text("Bairro: ${cras.bairro}", color = Color(0xFF6B7280), fontSize = 12.sp)
                                     Spacer(modifier = Modifier.height(4.dp))
                                     if (cras.latitude != null && cras.longitude != null) {
-                                        Text("📍 Toque para traçar a rota no mapa", color = Color(0xFF0F4C81), fontWeight = FontWeight.SemiBold, fontSize = 12.sp)
+                                        Text("ðŸ“ Toque para traÃ§ar a rota no mapa", color = Color(0xFF0F4C81), fontWeight = FontWeight.SemiBold, fontSize = 12.sp)
                                     } else {
                                         Text(cras.distancia, color = Color(0xFF0F4C81), fontWeight = FontWeight.SemiBold, fontSize = 12.sp)
                                     }
