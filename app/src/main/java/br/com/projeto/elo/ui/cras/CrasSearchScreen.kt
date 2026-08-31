@@ -1,4 +1,4 @@
-package br.com.projeto.elo.ui.cras
+﻿package br.com.projeto.elo.ui.cras
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -41,7 +41,7 @@ fun CrasSearchScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Buscar CRAS PrÃ³ximo", fontWeight = FontWeight.Bold) },
+                title = { Text("Buscar CRAS Próximo", fontWeight = FontWeight.Bold) },
                 navigationIcon = {
                     IconButton(onClick = aoVoltar) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Voltar")
@@ -64,7 +64,7 @@ fun CrasSearchScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Text(
-                "Digite seu CEP para encontrar as unidades do CRAS mais prÃ³ximas da sua residÃªncia.",
+                "Digite seu CEP para encontrar as unidades do CRAS mais próximas da sua residência.",
                 color = Color.Gray,
                 fontSize = 14.sp
             )
@@ -124,7 +124,7 @@ fun CrasSearchScreen(
 
             if (enderecoEncontrado != null) {
                 Text(
-                    text = "ðŸ“ $enderecoEncontrado",
+                    text = "📍 ${enderecoEncontrado}",
                     fontSize = 13.sp,
                     color = Color(0xFF047857),
                     fontWeight = FontWeight.SemiBold,
@@ -151,7 +151,7 @@ fun CrasSearchScreen(
                                         try {
                                             context.startActivity(intent)
                                         } catch (e: Exception) {
-                                            // Caso nÃ£o tenha app de mapas instalado
+                                            // Caso não tenha app de mapas instalado
                                         }
                                     }
                                 },
@@ -177,7 +177,7 @@ fun CrasSearchScreen(
                                     Text("Bairro: ${cras.bairro}", color = Color(0xFF6B7280), fontSize = 12.sp)
                                     Spacer(modifier = Modifier.height(4.dp))
                                     if (cras.latitude != null && cras.longitude != null) {
-                                        Text("ðŸ“ Toque para traÃ§ar a rota no mapa", color = Color(0xFF0F4C81), fontWeight = FontWeight.SemiBold, fontSize = 12.sp)
+                                        Text("📍 Toque para traçar a rota no mapa", color = Color(0xFF0F4C81), fontWeight = FontWeight.SemiBold, fontSize = 12.sp)
                                     } else {
                                         Text(cras.distancia, color = Color(0xFF0F4C81), fontWeight = FontWeight.SemiBold, fontSize = 12.sp)
                                     }
@@ -190,3 +190,5 @@ fun CrasSearchScreen(
         }
     }
 }
+
+
