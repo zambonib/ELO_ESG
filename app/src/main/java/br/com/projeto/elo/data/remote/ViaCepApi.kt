@@ -15,5 +15,6 @@ data class ViaCepResponse(
     val bairro: String? = null,
     val localidade: String? = null,
     val uf: String? = null,
+    val ibge: String? = null,
     val erro: Boolean? = null
 )

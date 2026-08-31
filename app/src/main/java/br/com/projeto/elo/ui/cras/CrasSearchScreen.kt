@@ -35,6 +35,7 @@ fun CrasSearchScreen(
     val erro by viewModel.erro.collectAsState()
     val resultados by viewModel.resultados.collectAsState()
     val enderecoEncontrado by viewModel.enderecoEncontrado.collectAsState()
+    val context = androidx.compose.ui.platform.LocalContext.current
 
     Scaffold(
         topBar = {
@@ -139,7 +140,19 @@ fun CrasSearchScreen(
                 LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     items(resultados) { cras ->
                         Card(
-                            modifier = Modifier.fillMaxWidth(),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .androidx.compose.foundation.clickable {
+                                    if (cras.latitude != null && cras.longitude != null) {
+                                        val uri = android.net.Uri.parse("geo:0,0?q=${cras.latitude},${cras.longitude}(${android.net.Uri.encode(cras.nome)})")
+                                        val intent = android.content.Intent(android.content.Intent.ACTION_VIEW, uri)
+                                        try {
+                                            context.startActivity(intent)
+                                        } catch (e: Exception) {
+                                            // Caso não tenha app de mapas instalado
+                                        }
+                                    }
+                                },
                             colors = CardDefaults.cardColors(containerColor = Color.White),
                             elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
                             shape = RoundedCornerShape(12.dp)
@@ -161,7 +174,11 @@ fun CrasSearchScreen(
                                     Text(cras.endereco, color = Color(0xFF6B7280), fontSize = 13.sp)
                                     Text("Bairro: ${cras.bairro}", color = Color(0xFF6B7280), fontSize = 12.sp)
                                     Spacer(modifier = Modifier.height(4.dp))
-                                    Text(cras.distancia, color = Color(0xFF0F4C81), fontWeight = FontWeight.SemiBold, fontSize = 12.sp)
+                                    if (cras.latitude != null && cras.longitude != null) {
+                                        Text("📍 Toque para traçar a rota no mapa", color = Color(0xFF0F4C81), fontWeight = FontWeight.SemiBold, fontSize = 12.sp)
+                                    } else {
+                                        Text(cras.distancia, color = Color(0xFF0F4C81), fontWeight = FontWeight.SemiBold, fontSize = 12.sp)
+                                    }
                                 }
                             }
                         }

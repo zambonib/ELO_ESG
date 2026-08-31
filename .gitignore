@@ -1,4 +1,4 @@
-*.iml
+﻿*.iml
 .gradle
 /local.properties
 /.idea/caches
@@ -13,3 +13,7 @@
 .externalNativeBuild
 .cxx
 local.properties
+node_modules/
+elo-esg-firebase-adminsdk-*.json
+node_modules/
+elo-esg-firebase-adminsdk-*.json
