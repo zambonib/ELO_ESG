@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/zambonib/ELO_ESG#readme",
   "dependencies": {
-    "firebase-admin": "^14.3.0"
+    "firebase-admin": "^14.3.0",
+    "pptxgenjs": "^4.0.1"
   }
 }

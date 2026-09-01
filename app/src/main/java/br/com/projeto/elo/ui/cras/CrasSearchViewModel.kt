@@ -80,6 +80,7 @@ class CrasSearchViewModel @Inject constructor(
                         // 3. Query no Firestore
                         val snapshot = firestore.collection("cras")
                             .whereEqualTo("ibge", ibgeFirebase)
+                            .limit(10)
                             .get()
                             .await()
                             

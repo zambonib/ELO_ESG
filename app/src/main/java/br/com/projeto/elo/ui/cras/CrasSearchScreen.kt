@@ -1,4 +1,4 @@
-﻿package br.com.projeto.elo.ui.cras
+package br.com.projeto.elo.ui.cras
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -72,7 +72,7 @@ fun CrasSearchScreen(
             OutlinedTextField(
                 value = cepDigitado,
                 onValueChange = { viewModel.onCepChanged(it) },
-                label = { Text("CEP (somente nÃºmeros)") },
+                label = { Text("CEP (somente números)") },
                 placeholder = { Text("Ex: 01001000") },
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Number,
