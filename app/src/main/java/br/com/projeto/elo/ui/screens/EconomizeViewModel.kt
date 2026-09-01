@@ -1,83 +1,89 @@
+
 package br.com.projeto.elo.ui.screens
 
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import br.com.projeto.elo.BuildConfig
+import br.com.projeto.elo.data.remote.Content
+import br.com.projeto.elo.data.remote.GeminiApi
+import br.com.projeto.elo.data.remote.GeminiRequest
+import br.com.projeto.elo.data.remote.Part
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import retrofit2.HttpException
 import javax.inject.Inject
 
-/**
- * ViewModel para a tela Economize.
- * Gerencia o estado da calculadora de economia baseada em IA (Gemini).
- */
 @HiltViewModel
-class EconomizeViewModel @Inject constructor() : ViewModel() {
+class EconomizeViewModel @Inject constructor(
+    application: Application,
+    private val geminiApi: GeminiApi
+) : AndroidViewModel(application) {
 
-    // --- ESTADOS DA CALCULADORA DE ECONOMIA (IA) ---
-
-    // Armazena a pergunta/query digitada pelo usuário no input
     private val _queryCalculadora = MutableStateFlow("")
     val queryCalculadora: StateFlow<String> = _queryCalculadora.asStateFlow()
 
-    // Armazena a resposta recebida do Gemini (ou null se não houver)
     private val _respostaCalculadora = MutableStateFlow<String?>(null)
     val respostaCalculadora: StateFlow<String?> = _respostaCalculadora.asStateFlow()
 
-    // Controla o estado de carregamento (mostra o spinner no botão)
     private val _carregandoCalculadora = MutableStateFlow(false)
     val carregandoCalculadora: StateFlow<Boolean> = _carregandoCalculadora.asStateFlow()
 
-    // --- FUNÇÕES DE INTERAÇÃO COM A UI ---
-
-    /**
-     * Atualiza o estado da query conforme o usuário digita.
-     */
     fun atualizarQueryCalculadora(novaQuery: String) {
         _queryCalculadora.value = novaQuery
     }
 
-    /**
-     * Envia a pergunta do usuário para a IA calcular a economia estimada.
-     * Atualmente simulado com delay e resposta fixa.
-     */
     fun calcularEconomiaAi(pergunta: String) {
         if (pergunta.isBlank()) return
 
         viewModelScope.launch {
-            // Inicia o estado de carregamento e limpa resposta anterior
             _carregandoCalculadora.value = true
             _respostaCalculadora.value = null
 
-            // -----------------------------------------------------------------------------------
-            // TODO: INTEGRAR CHAMADA REAL PARA O GEMINI AQUI
-            //
-            // Exemplo de como seria com um repositório:
-            // try {
-            //     val resultado = geminiRepository.perguntarCalculoEconomia(pergunta)
-            //     _respostaCalculadora.value = resultado
-            // } catch (e: Exception) {
-            //     _respostaCalculadora.value = "Desculpe, ocorreu um erro ao calcular. Tente novamente."
-            // }
-            // -----------------------------------------------------------------------------------
+            try {
+                val instrucao = """
+                    Você é um especialista em eficiência energética do aplicativo financeiro Elo.
+                    Sua tarefa é estimar a economia de energia em kWh e/ou Reais baseada na ação descrita pelo usuário.
 
-            // --- SIMULAÇÃO (Remova isto quando integrar o Gemini real) ---
-            // Simula um delay de rede de 2.5 segundos
-            delay(2500)
+                    REGRA 1: Se a pergunta NÃO for estritamente sobre economia de energia, água, sustentabilidade ou eficiência de aparelhos elétricos/eletrônicos, você DEVE responder EXATAMENTE com a seguinte frase e nada mais:
+                    "Por favor, me faça perguntas relacionadas apenas à economia de energia, água ou sustentabilidade. Meu objetivo aqui é calcular seus ganhos sustentáveis!"
 
-            // Resposta de exemplo baseada na pergunta comum de lâmpadas
-            _respostaCalculadora.value = """
-                Com base em médias de mercado, trocar 10 lâmpadas incandescentes comuns por LED geraria uma economia estimada de aproximadamente **25 kWh por mês**.
+                    REGRA 2: Se for sobre energia/água, faça uma estimativa realista baseada em médias de mercado brasileiras.
+                    REGRA 3: Seja breve, direto ao ponto e use negrito (**) para destacar os valores economizados. Não passe de um parágrafo.
 
-                Isso representa uma redução de cerca de **R$ 22,50** na sua conta (considerando uma tarifa média de R$ 0,90 por kWh). Essa estimativa supõe um uso médio de 5 horas por dia.
-            """.trimIndent()
-            // -----------------------------------------------------------------
+                    Pergunta do usuário: $pergunta
+                """.trimIndent()
 
-            // Finaliza o estado de carregamento
-            _carregandoCalculadora.value = false
+                val request = GeminiRequest(listOf(Content(listOf(Part(instrucao)))))
+                val resposta = geminiApi.classificarTransacao(BuildConfig.GEMINI_API_KEY, request)
+                val texto = resposta.candidates?.firstOrNull()?.content?.parts?.firstOrNull()?.text
+
+                if (texto != null) {
+                    _respostaCalculadora.value = texto.trim()
+                } else {
+                    _respostaCalculadora.value = "Não consegui processar essa pergunta agora. Tente novamente."
+                }
+
+            } catch (e: HttpException) {
+                e.printStackTrace()
+                val msgAmigavel = when (e.code()) {
+                    403 -> "Acesso negado à IA. Verifique se a chave colada está correta e ativa."
+                    503 -> "Servidor da IA temporariamente sobrecarregado. Tente novamente em alguns segundos."
+                    404 -> "Modelo da IA não encontrado. Verifique a conexão."
+                    else -> "Desculpe, ocorreu um erro de conexão com a IA (HTTP ${e.code()})."
+                }
+                _respostaCalculadora.value = msgAmigavel
+
+            } catch (e: Exception) {
+                e.printStackTrace()
+                _respostaCalculadora.value = "Desculpe, ocorreu um erro genérico ao calcular. Tente novamente."
+
+            } finally {
+                _carregandoCalculadora.value = false
+            }
         }
     }
 }

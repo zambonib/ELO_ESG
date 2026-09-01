@@ -1,3 +1,4 @@
+
 package br.com.projeto.elo.ui.screens
 
 import androidx.compose.foundation.Image
@@ -30,35 +31,21 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import br.com.projeto.elo.ui.components.BarraNavegacaoElo
 import br.com.projeto.elo.ui.theme.*
 import br.com.projeto.elo.R
-import kotlinx.coroutines.launch
+import br.com.projeto.elo.ui.screens.EconomizeViewModel
 
-/**
- * Tela Economize.
- * Focada em guias de economia e calculadora de KWH com IA.
- */
 @Composable
 fun EconomizeScreen(
-    aoNavegar: (String) -> Unit = {}
+    aoNavegar: (String) -> Unit = {},
+    viewModel: EconomizeViewModel = hiltViewModel() // Conexão com o ViewModel real
 ) {
-    var queryCalculadora by remember { mutableStateOf("") }
-    var respostaCalculadora by remember { mutableStateOf<String?>(null) }
-    var carregandoCalculadora by remember { mutableStateOf(false) }
-    val composableScope = rememberCoroutineScope()
-
-    fun simularChamadaGemini(pergunta: String) {
-        if (pergunta.isBlank()) return
-        carregandoCalculadora = true
-        respostaCalculadora = null
-
-        composableScope.launch {
-            kotlinx.coroutines.delay(2000)
-            respostaCalculadora = "Com base em médias de mercado, trocar 10 lâmpadas comuns por LED geraria uma economia estimada de aproximadamente **25 kWh por mês**.\n\nIsso representa uma redução de cerca de **R$ 22,50** na sua conta."
-            carregandoCalculadora = false
-        }
-    }
+    // Coleta os dados em tempo real da API Gemini através do ViewModel
+    val queryCalculadora by viewModel.queryCalculadora.collectAsState()
+    val respostaCalculadora by viewModel.respostaCalculadora.collectAsState()
+    val carregandoCalculadora by viewModel.carregandoCalculadora.collectAsState()
 
     Scaffold(
         bottomBar = {
@@ -72,7 +59,6 @@ fun EconomizeScreen(
                 .padding(paddingValues)
                 .verticalScroll(rememberScrollState())
         ) {
-            // Header Verde (Economize)
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -81,18 +67,9 @@ fun EconomizeScreen(
                     .padding(24.dp)
             ) {
                 Column(modifier = Modifier.padding(top = 16.dp)) {
-                    Text(
-                        "Economize 🌱",
-                        color = Color.White,
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.Black
-                    )
+                    Text("Economize 🌱", color = Color.White, fontSize = 24.sp, fontWeight = FontWeight.Black)
                     Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        "Pequenas ações, grandes transformações.",
-                        color = Color.White.copy(alpha = 0.8f),
-                        fontSize = 14.sp
-                    )
+                    Text("Pequenas ações, grandes transformações.", color = Color.White.copy(alpha = 0.8f), fontSize = 14.sp)
                 }
             }
 
@@ -102,7 +79,6 @@ fun EconomizeScreen(
             ) {
                 SectionTitle(title = "Guia de economia", color = VerdeFundo)
 
-                // ÁGUA
                 ExpandableGuideCard(
                     title = "Água: Consumo Consciente",
                     icon = Icons.Default.WaterDrop,
@@ -112,7 +88,6 @@ fun EconomizeScreen(
                     shortDescription = "Reduza a conta de água com dicas simples para sua casa."
                 )
 
-                // ELETRICIDADE
                 ExpandableGuideCard(
                     title = "Eletricidade: Conta Mais Leve",
                     icon = Icons.Default.Bolt,
@@ -122,7 +97,6 @@ fun EconomizeScreen(
                     shortDescription = "Poupe energia e mantenha seu dinheiro no bolso."
                 )
 
-                // TECNOLOGIA
                 ExpandableGuideCard(
                     title = "Tecnologia: Green IT",
                     icon = Icons.Default.Memory,
@@ -134,22 +108,19 @@ fun EconomizeScreen(
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                // --- CALCULADORA DE ECONOMIA ---
                 SectionTitle(title = "Calculadora de economia de KWH", color = VerdeFundo)
 
                 CalculadoraEconomiaAiCard(
                     query = queryCalculadora,
-                    onQueryChanged = { queryCalculadora = it },
+                    onQueryChanged = { viewModel.atualizarQueryCalculadora(it) },
                     response = respostaCalculadora,
                     isLoading = carregandoCalculadora,
-                    onCalculateClick = { simularChamadaGemini(queryCalculadora) }
+                    onCalculateClick = { viewModel.calcularEconomiaAi(queryCalculadora) }
                 )
             }
         }
     }
 }
-
-// --- COMPONENTES AUXILIARES ---
 
 @Composable
 private fun SectionTitle(title: String, color: Color) {
@@ -162,9 +133,6 @@ private fun SectionTitle(title: String, color: Color) {
     )
 }
 
-/**
- * Card contendo a calculadora de economia baseada em IA.
- */
 @Composable
 private fun CalculadoraEconomiaAiCard(
     query: String,
@@ -196,7 +164,7 @@ private fun CalculadoraEconomiaAiCard(
                     text = "Pergunte ao Elo quanto você pode economizar",
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color(0xFF1F2937) // TextDark
+                    color = Color(0xFF1F2937)
                 )
             }
 
@@ -235,7 +203,6 @@ private fun CalculadoraEconomiaAiCard(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // Botão de Calcular
             Button(
                 onClick = onCalculateClick,
                 modifier = Modifier.fillMaxWidth(),
@@ -259,7 +226,6 @@ private fun CalculadoraEconomiaAiCard(
                 }
             }
 
-            // Área de Resposta do Gemini
             if (response != null || isLoading) {
                 Spacer(modifier = Modifier.height(16.dp))
                 HorizontalDivider(color = Color.LightGray.copy(alpha = 0.3f))
@@ -269,7 +235,7 @@ private fun CalculadoraEconomiaAiCard(
                     modifier = Modifier
                         .fillMaxWidth()
                         .clip(RoundedCornerShape(12.dp))
-                        .background(Color(0xFFF9FAFB)) // Fundo cinza claro para a resposta
+                        .background(Color(0xFFF9FAFB))
                         .border(1.dp, Color.LightGray.copy(alpha = 0.5f), RoundedCornerShape(12.dp))
                         .padding(16.dp)
                 ) {
@@ -293,7 +259,7 @@ private fun CalculadoraEconomiaAiCard(
                             Text(
                                 text = response,
                                 fontSize = 13.sp,
-                                color = Color(0xFF4B5563), // TextMuted
+                                color = Color(0xFF4B5563),
                                 lineHeight = 20.sp
                             )
                         }
@@ -304,9 +270,6 @@ private fun CalculadoraEconomiaAiCard(
     }
 }
 
-/**
- * Card de guia que exibe detalhes em um Popup (Dialog) ao ser clicado.
- */
 @Composable
 private fun ExpandableGuideCard(
     title: String,
@@ -316,49 +279,24 @@ private fun ExpandableGuideCard(
     borderColor: Color,
     shortDescription: String
 ) {
-    // Estado para controlar a exibição do popup
     var showDialog by remember { mutableStateOf(false) }
 
-    // Popup (Dialog) com as informações detalhadas
     if (showDialog) {
         AlertDialog(
             onDismissRequest = { showDialog = false },
             properties = androidx.compose.ui.window.DialogProperties(usePlatformDefaultWidth = false),
-
-            icon = {
-                Icon(
-                    imageVector = icon,
-                    contentDescription = null,
-                    tint = iconTint,
-                    modifier = Modifier.size(28.dp)
-                )
-            },
-            title = {
-                Text(
-                    text = title,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color(0xFF1F2937),
-                    textAlign = TextAlign.Center
-                )
-            },
-            modifier = Modifier
-                .fillMaxWidth(0.92f)
-                .wrapContentHeight()
-                .padding(16.dp),
+            icon = { Icon(imageVector = icon, contentDescription = null, tint = iconTint, modifier = Modifier.size(28.dp)) },
+            title = { Text(text = title, fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color(0xFF1F2937), textAlign = TextAlign.Center) },
+            modifier = Modifier.fillMaxWidth(0.92f).wrapContentHeight().padding(16.dp),
             shape = RoundedCornerShape(24.dp),
             containerColor = Color.White,
             text = {
                 Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 8.dp)
-                        .verticalScroll(rememberScrollState()),
+                    modifier = Modifier.fillMaxWidth().padding(top = 8.dp).verticalScroll(rememberScrollState()),
                     verticalArrangement = Arrangement.spacedBy(20.dp)
                 ) {
                     HorizontalDivider(color = borderColor)
 
-                    // TEXTO INTRODUTÓRIO
                     val introText = when (title) {
                         "Água: Consumo Consciente" -> "Guias práticos de consumo consciente geram um duplo impacto real: reduzem a pegada ecológica da sua família e criam economia imediata no orçamento doméstico."
                         "Eletricidade: Conta Mais Leve" -> "Diferente de falsas ilusões financeiras geradas por simuladores de investimentos de curto prazo, economizar energia é um ganho garantido, ético e sem riscos."
@@ -367,18 +305,11 @@ private fun ExpandableGuideCard(
                     }
 
                     if (introText.isNotEmpty()) {
-                        Text(
-                            text = introText,
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color(0xFF4B5563),
-                            lineHeight = 24.sp
-                        )
+                        Text(text = introText, fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color(0xFF4B5563), lineHeight = 24.sp)
                         Spacer(modifier = Modifier.height(12.dp))
                         HorizontalDivider(color = borderColor)
                     }
 
-                    // LISTA DE TÓPICOS COM IMAGENS
                     val guideItems = when (title) {
                         "Água: Consumo Consciente" -> listOf(
                             Pair(R.drawable.vazamento, "Cheque vazamentos regularmente. Um pequeno gotejamento na torneira ou na válvula do vaso sanitário pode desperdiçar dezenas de litros por dia, inflando sua conta no final do mês sem que você perceba."),
@@ -398,94 +329,36 @@ private fun ExpandableGuideCard(
                         else -> emptyList()
                     }
 
-                    guideItems.forEach { (imageRes, itemText) ->
-                        GuideItem(imageRes = imageRes, text = itemText)
-                    }
+                    guideItems.forEach { (imageRes, itemText) -> GuideItem(imageRes = imageRes, text = itemText) }
                 }
             },
-            confirmButton = {
-                TextButton(
-                    onClick = { showDialog = false }
-                ) {
-                    Text("Fechar", color = iconTint, fontWeight = FontWeight.Bold, fontSize = 16.sp)
-                }
-            }
+            confirmButton = { TextButton(onClick = { showDialog = false }) { Text("Fechar", color = iconTint, fontWeight = FontWeight.Bold, fontSize = 16.sp) } }
         )
     }
 
-    // Design do Card principal
     Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(16.dp))
-            .background(bgColor)
-            .border(1.dp, borderColor, RoundedCornerShape(16.dp))
-            .clickable { showDialog = true }
-            .padding(16.dp)
+        modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(bgColor).border(1.dp, borderColor, RoundedCornerShape(16.dp)).clickable { showDialog = true }.padding(16.dp)
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Box(
-                modifier = Modifier
-                    .size(40.dp)
-                    .clip(RoundedCornerShape(10.dp))
-                    .background(Color.White)
-                    .border(1.dp, borderColor, RoundedCornerShape(10.dp)),
+                modifier = Modifier.size(40.dp).clip(RoundedCornerShape(10.dp)).background(Color.White).border(1.dp, borderColor, RoundedCornerShape(10.dp)),
                 contentAlignment = Alignment.Center
             ) {
-                Icon(
-                    imageVector = icon,
-                    contentDescription = null,
-                    tint = iconTint,
-                    modifier = Modifier.size(24.dp)
-                )
+                Icon(imageVector = icon, contentDescription = null, tint = iconTint, modifier = Modifier.size(24.dp))
             }
             Spacer(modifier = Modifier.width(12.dp))
-            Text(
-                text = title,
-                fontSize = 15.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color(0xFF1F2937) // TextDark
-            )
+            Text(text = title, fontSize = 15.sp, fontWeight = FontWeight.Bold, color = Color(0xFF1F2937))
         }
-
         Spacer(modifier = Modifier.height(12.dp))
-
-        Text(
-            text = shortDescription,
-            fontSize = 13.sp,
-            color = Color(0xFF1F2937), // TextDark
-            fontWeight = FontWeight.Medium,
-            lineHeight = 18.sp
-        )
+        Text(text = shortDescription, fontSize = 13.sp, color = Color(0xFF1F2937), fontWeight = FontWeight.Medium, lineHeight = 18.sp)
     }
 }
 
 @Composable
 private fun GuideItem(@androidx.annotation.DrawableRes imageRes: Int, text: String) {
-    Column(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            text = "• $text",
-            modifier = Modifier.fillMaxWidth(),
-            fontSize = 14.sp,
-            color = Color(0xFF4B5563), // TextMuted
-            lineHeight = 22.sp,
-            textAlign = TextAlign.Start
-        )
-
+    Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+        Text(text = "• $text", modifier = Modifier.fillMaxWidth(), fontSize = 14.sp, color = Color(0xFF4B5563), lineHeight = 22.sp, textAlign = TextAlign.Start)
         Spacer(modifier = Modifier.height(12.dp))
-
-        Image(
-            painter = androidx.compose.ui.res.painterResource(id = imageRes),
-            contentDescription = null,
-            contentScale = ContentScale.Fit,
-            modifier = Modifier
-                .fillMaxWidth(0.8f)
-                .height(110.dp)
-                .clip(RoundedCornerShape(12.dp))
-                .padding(8.dp)
-        )
+        Image(painter = androidx.compose.ui.res.painterResource(id = imageRes), contentDescription = null, contentScale = ContentScale.Fit, modifier = Modifier.fillMaxWidth(0.8f).height(110.dp).clip(RoundedCornerShape(12.dp)).padding(8.dp))
     }
 }

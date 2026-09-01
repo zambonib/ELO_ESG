@@ -529,3 +529,4 @@ private fun TituloSecao(texto: String) {
 private fun TextoVazio(texto: String) {
     Text(texto, color = Color.Gray, fontSize = 14.sp)
 }
+
