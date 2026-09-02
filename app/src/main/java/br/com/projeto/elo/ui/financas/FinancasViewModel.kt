@@ -95,6 +95,11 @@ class FinancasViewModel @Inject constructor(
         calcularScore(taxa, aderenciaOrcamento(orcs))
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0)
 
+    // ── Indica se o mês selecionado ainda não tem nenhum lançamento ──
+    val semLancamentos: StateFlow<Boolean> = combine(receitas, despesas) { r, d ->
+        r <= 0.0 && d <= 0.0
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), true)
+
     // ── Evolução dos últimos 6 meses a partir do mês selecionado ─────
     val evolucao6Meses: StateFlow<List<MesResumo>> = _mesAnchor
         .flatMapLatest { anchor ->

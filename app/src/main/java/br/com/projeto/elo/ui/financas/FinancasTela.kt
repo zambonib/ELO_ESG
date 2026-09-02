@@ -2,6 +2,8 @@ package br.com.projeto.elo.ui.financas
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -50,6 +52,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -66,6 +69,7 @@ import br.com.projeto.elo.ui.theme.VermelhoSeta
 import java.text.NumberFormat
 import java.util.Date
 import java.util.Locale
+import kotlin.math.atan2
 
 // Paleta usada para diferenciar as fatias do gráfico de categorias
 private val CoresCategorias = listOf(
@@ -85,6 +89,7 @@ fun FinancasTela(
     val gastosPorCategoria by viewModel.gastosPorCategoria.collectAsState()
     val orcamentos by viewModel.orcamentos.collectAsState()
     val scoreSaude by viewModel.scoreSaude.collectAsState()
+    val semLancamentos by viewModel.semLancamentos.collectAsState()
     val evolucao by viewModel.evolucao6Meses.collectAsState()
     val dicaIa by viewModel.dicaIa.collectAsState()
     val carregandoDica by viewModel.carregandoDica.collectAsState()
@@ -137,6 +142,7 @@ fun FinancasTela(
                 Column {
                     CardSaudeFinanceira(
                         score = scoreSaude,
+                        semLancamentos = semLancamentos,
                         dica = dicaIa,
                         carregando = carregandoDica,
                         onGerarDica = viewModel::gerarDicaFinanceira
@@ -247,11 +253,13 @@ private fun SeletorMes(mesAnchor: Long, onVoltar: () -> Unit, onAvancar: () -> U
 @Composable
 private fun CardSaudeFinanceira(
     score: Int,
+    semLancamentos: Boolean,
     dica: String?,
     carregando: Boolean,
     onGerarDica: () -> Unit
 ) {
     val (rotulo, cor) = when {
+        semLancamentos -> "Sem lançamentos" to Color.Gray
         score >= 70 -> "Saudável" to VerdeFundo
         score >= 40 -> "Atenção" to LaranjaBotao
         else -> "Crítico" to VermelhoSeta
@@ -270,34 +278,44 @@ private fun CardSaudeFinanceira(
                     Text("Saúde financeira", fontSize = 14.sp, color = Color.Gray)
                     Text(rotulo, fontSize = 20.sp, fontWeight = FontWeight.ExtraBold, color = cor)
                 }
-                Text("$score/100", fontSize = 26.sp, fontWeight = FontWeight.ExtraBold, color = cor)
+                Text(
+                    if (semLancamentos) "—" else "$score/100",
+                    fontSize = 26.sp, fontWeight = FontWeight.ExtraBold, color = cor
+                )
             }
             Spacer(Modifier.height(8.dp))
             LinearProgressIndicator(
-                progress = { score / 100f },
+                progress = { if (semLancamentos) 0f else score / 100f },
                 modifier = Modifier.fillMaxWidth().height(8.dp).clip(RoundedCornerShape(4.dp)),
                 color = cor,
                 trackColor = cor.copy(alpha = 0.2f)
             )
             Spacer(Modifier.height(12.dp))
 
-            if (dica != null) {
-                Text("💡 $dica", fontSize = 13.sp, color = Color.DarkGray)
-                Spacer(Modifier.height(8.dp))
-            }
-
-            Button(
-                onClick = onGerarDica,
-                enabled = !carregando,
-                colors = ButtonDefaults.buttonColors(containerColor = LaranjaBotao),
-                shape = RoundedCornerShape(12.dp)
-            ) {
-                Icon(Icons.Default.AutoAwesome, contentDescription = null, tint = Color.White)
-                Spacer(Modifier.width(8.dp))
+            if (semLancamentos) {
                 Text(
-                    if (carregando) "Gerando dica..." else if (dica == null) "Gerar dica com IA" else "Nova dica",
-                    color = Color.White
+                    "Registre suas receitas e despesas do mês no Dashboard para ver sua saúde financeira.",
+                    fontSize = 13.sp, color = Color.DarkGray
                 )
+            } else {
+                if (dica != null) {
+                    Text("💡 $dica", fontSize = 13.sp, color = Color.DarkGray)
+                    Spacer(Modifier.height(8.dp))
+                }
+
+                Button(
+                    onClick = onGerarDica,
+                    enabled = !carregando,
+                    colors = ButtonDefaults.buttonColors(containerColor = LaranjaBotao),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Icon(Icons.Default.AutoAwesome, contentDescription = null, tint = Color.White)
+                    Spacer(Modifier.width(8.dp))
+                    Text(
+                        if (carregando) "Gerando dica..." else if (dica == null) "Gerar dica com IA" else "Nova dica",
+                        color = Color.White
+                    )
+                }
             }
         }
     }
@@ -305,11 +323,33 @@ private fun CardSaudeFinanceira(
 
 @Composable
 private fun GraficoRosca(itens: List<CategoriaTotal>, total: Double) {
+    var indiceSelecionado by remember(itens) { mutableStateOf<Int?>(null) }
+    val fmt = remember { NumberFormat.getCurrencyInstance(Locale("pt", "BR")) }
+
     Box(
         modifier = Modifier.fillMaxWidth().height(180.dp),
         contentAlignment = Alignment.Center
     ) {
-        Canvas(modifier = Modifier.size(160.dp)) {
+        Canvas(
+            modifier = Modifier
+                .size(160.dp)
+                .pointerInput(itens, total) {
+                    awaitEachGesture {
+                        val down = awaitFirstDown(requireUnconsumed = false)
+                        indiceSelecionado = indiceDaFatia(down.position, size.width, size.height, itens, total)
+                        var pressionado = true
+                        while (pressionado) {
+                            val evento = awaitPointerEvent()
+                            val mudanca = evento.changes.firstOrNull { it.id == down.id }
+                            pressionado = mudanca?.pressed == true
+                            if (pressionado && mudanca != null) {
+                                indiceSelecionado = indiceDaFatia(mudanca.position, size.width, size.height, itens, total)
+                            }
+                        }
+                        indiceSelecionado = null
+                    }
+                }
+        ) {
             val larguraTraco = 34.dp.toPx()
             val diametro = size.minDimension - larguraTraco
             val canto = Offset((size.width - diametro) / 2f, (size.height - diametro) / 2f)
@@ -324,23 +364,58 @@ private fun GraficoRosca(itens: List<CategoriaTotal>, total: Double) {
             } else {
                 itens.forEachIndexed { index, item ->
                     val varredura = (item.total / total).toFloat() * 360f
+                    val destacada = indiceSelecionado == index
+                    val esmaecida = indiceSelecionado != null && !destacada
                     drawArc(
                         color = CoresCategorias[index % CoresCategorias.size],
                         startAngle = inicio, sweepAngle = varredura, useCenter = false,
-                        topLeft = canto, size = tamanho, style = Stroke(larguraTraco, cap = StrokeCap.Butt)
+                        topLeft = canto, size = tamanho,
+                        style = Stroke(if (destacada) larguraTraco + 10f else larguraTraco, cap = StrokeCap.Butt),
+                        alpha = if (esmaecida) 0.35f else 1f
                     )
                     inicio += varredura
                 }
             }
         }
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text("Total", fontSize = 12.sp, color = Color.Gray)
-            Text(
-                NumberFormat.getCurrencyInstance(Locale("pt", "BR")).format(total),
-                fontSize = 16.sp, fontWeight = FontWeight.Bold
-            )
+        Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(horizontal = 8.dp)) {
+            val itemSelecionado = indiceSelecionado?.let { itens.getOrNull(it) }
+            if (itemSelecionado != null) {
+                val percentual = if (total > 0) (itemSelecionado.total / total * 100).toInt() else 0
+                Text(
+                    itemSelecionado.categoria,
+                    fontSize = 12.sp, color = Color.Gray,
+                    textAlign = TextAlign.Center, maxLines = 2
+                )
+                Text(fmt.format(itemSelecionado.total), fontSize = 15.sp, fontWeight = FontWeight.Bold)
+                Text("$percentual% do total", fontSize = 11.sp, color = Color.Gray)
+            } else {
+                Text("Total", fontSize = 12.sp, color = Color.Gray)
+                Text(fmt.format(total), fontSize = 16.sp, fontWeight = FontWeight.Bold)
+            }
         }
     }
+}
+
+// Determina qual fatia da rosca está sob o toque (ângulo a partir do centro do Canvas)
+private fun indiceDaFatia(
+    posicao: Offset,
+    largura: Int,
+    altura: Int,
+    itens: List<CategoriaTotal>,
+    total: Double
+): Int? {
+    if (total <= 0.0 || itens.isEmpty()) return null
+    val dx = posicao.x - largura / 2f
+    val dy = posicao.y - altura / 2f
+    var angulo = Math.toDegrees(atan2(dy.toDouble(), dx.toDouble())).toFloat() + 90f
+    if (angulo < 0f) angulo += 360f
+    var acumulado = 0f
+    itens.forEachIndexed { index, item ->
+        val varredura = (item.total / total).toFloat() * 360f
+        if (angulo < acumulado + varredura) return index
+        acumulado += varredura
+    }
+    return itens.lastIndex
 }
 
 @Composable
